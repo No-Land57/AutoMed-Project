@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function UserDetailsScreen() {
+export default function UserDetailsScreen({ navigation}) {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [userType, setUserType] = useState(''); // Guardian, Worker, or Patient
@@ -11,7 +11,13 @@ export default function UserDetailsScreen() {
     console.log('Name:', name);
     console.log('Age:', age);
     console.log('User Type:', userType);
+    if(!name || !age || !userType) {
+      alert('Please fill out all fileds.');
+      return;
+    }
+
     // Save data or navigate to the next screen
+    navigation.navigate('SetSched', {name, age, userType,}); // Navigate to Set Schedule Screen
   };
 
   return (
