@@ -5,7 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import SignUpScreen from './SignUpScreen';
-import UserDetailsScreen from '../UserDetails/UserDetailsScreen'; // Adjust this path based on your structure
+import UserDetailsScreen from '../UserDetails/UserDetailsScreen';
+import SetSched from '../UserDetails/SetSched';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ function LoginScreen({ navigation }) {
   const handleLogin = () => {
     console.log('Username:', username);
     console.log('Password:', password);
+    navigation.navigate('UserDetails');
   };
 
   return (
@@ -80,6 +82,11 @@ export default function Home() {
           component={UserDetailsScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name = "SetSched"
+          component = {SetSched}
+          options = {{headerShown: false}}
+          />
       </Stack.Navigator>
     </NavigationContainer>
   );
