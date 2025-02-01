@@ -1,16 +1,48 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput } from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function SetSched({route, navigation }) {
-  const { name, age, userType } = route.params; //get data from UserDetails
+export default function SetSched({ route, navigation }) {
+  // Safely retrieve user data from UserDetailsScreen
+  const { name = 'Unknown', age = 'N/A', userType = 'N/A' } = route?.params || {};
+
+  // State for prescription details
   const [drug, setDrug] = useState('');
   const [dose, setDose] = useState('');
-  const [time, setTime] = useState('');
-  const [day, setDay] = useState('');
+  const [time, setTime] = useState(''); // Store formatted time
+  const [selectedDays, setSelectedDays] = useState([]); // Store selected days
+  const [showDaySelection, setShowDaySelection] = useState(false); // Show/hide day selection
+  const [isTimePickerVisible, setTimePickerVisible] = useState(false); // Show/hide time picker
 
+  const daysOfWeek = ['Every Sun',
+     'Every Mon', 
+     'Every Tue', 
+     'Every Wed', 
+     'Every Thur', 
+     'Every Fri', 
+     'Every Sat'];
+
+  const toggleDaySelection = (day) => {
+    setSelectedDays((prevDays) =>
+      prevDays.includes(day) ? prevDays.filter((d) => d !== day) : [...prevDays, day]
+    );
+  };
+
+  // Function to handle time selection
+  const handleConfirmTime = (selectedTime) => {
+    const formattedTime = selectedTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true, // AM/PM format
+    });
+    setTime(formattedTime);
+    setTimePickerVisible(false);
+  };
+
+  // Handle medication dispensing
   const handleDispense = () => {
-    if (!drug || !dose || !time || !day) {
+    if (!drug || !dose || !selectedDays.length === 0 || !time) {
       alert('Please fill out all fields.');
       return;
     }
@@ -18,63 +50,110 @@ export default function SetSched({route, navigation }) {
     navigation.goBack(); // Navigate back after dispensing
   };
 
+  const getSelectedDaysText = () => {
+    const sortedDays = selectedDays.sort((a, b) => daysOfWeek.indexOf(a) - daysOfWeek.indexOf(b));
+    return sortedDays.length === daysOfWeek.length ? 'Everyday' : sortedDays.join(', ');
+  };
+
+  const handleConfirmDays = () => {
+    setShowDaySelection(false);
+  };
+
   return (
     <LinearGradient colors={['#13c2c2', '#6b73ff']} style={styles.container}>
       {/* Header Section */}
-              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Text style={styles.backButtonText}>{'<'} Back</Text>
         </TouchableOpacity>
-      <View style={styles.header}>
-
         <View style={styles.userInfo}>
-          <Image
-            source={require('../assets/profile.png')} // Replace with the actual profile picture
-            style={styles.profileImage}
-          />
+          <Image source={require('../assets/profile.png')} style={styles.profileImage} />
           <View>
             <Text style={styles.userName}>{name}</Text>
-            <Text style={styles.userDetails}>{age} years old</Text>
-            <Text style={styles.userStatus}>{userType}</Text>
+            <Text style={styles.userDetails}>
+              {userType}, {age} years old
+            </Text>
+            <Text style={styles.userStatus}>Normal</Text>
           </View>
         </View>
       </View>
 
-      {/* Medication Details */}
+      {/* Prescription Section */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Medication Details</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Medicine"
-          placeholderTextColor="#d3d3d3"
-          value={drug}
-          onChangeText={setDrug}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Dose"
-          placeholderTextColor="#d3d3d3"
-          value={dose}
-          onChangeText={setDose}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Time"
-          placeholderTextColor="#d3d3d3"
-          value={time}
-          onChangeText={setTime}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Day"
-          placeholderTextColor="#d3d3d3"
-          value={day}
-          onChangeText={setDay}
+        <Text style={styles.cardTitle}>Prescription</Text>
+        <View style={styles.table}>
+            {/* Drug Input */}
+            <TextInput
+            style={styles.tableCell}
+            placeholder="Drug"
+             placeholderTextColor="#aaa"
+            value={drug}
+            onChangeText={setDrug}
+            />
+            {/* Dose Input */}
+            <TextInput
+            style={styles.tableCell}
+            placeholder="Dose"
+            placeholderTextColor="#aaa"
+            value={dose}
+            onChangeText={setDose}
+            />
+            
+          {/* Day Selection */}
+          <TouchableOpacity
+            style={styles.daySelectionButton}
+            onPress={() => setShowDaySelection(!showDaySelection)}
+          >
+            <Text style={styles.inputText}>
+              {selectedDays.length > 0 ? getSelectedDaysText() : 'Select Days'}
+            </Text>
+          </TouchableOpacity>
+          {showDaySelection && (
+            <View style={styles.daySelection}>
+              {daysOfWeek.map((day) => (
+                <TouchableOpacity
+                  key={day}
+                  style={[
+                    styles.dayButton,
+                    selectedDays.includes(day) && styles.dayButtonSelected,
+                  ]}
+                  onPress={() => toggleDaySelection(day)}
+                >
+                  <Text style={styles.dayButtonText}>{day}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmDays}>
+                <Text style={styles.confirmButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Time Picker */}
+          <View style={styles.tableRow}>
+            <TouchableOpacity style={styles.timePicker} onPress={() => setTimePickerVisible(true)}>
+              <Text style={styles.inputText}>{time || 'Set Time'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {/* Time Picker Modal */}
+        <DateTimePickerModal
+          isVisible={isTimePickerVisible}
+          mode="time"
+          is24Hour={false} // Uses AM/PM format
+          onConfirm={handleConfirmTime}
+          onCancel={() => setTimePickerVisible(false)}
         />
       </View>
+
+      {/* Dispense Button */}
+      <TouchableOpacity style={styles.dispenseButton} onPress={handleDispense}>
+        <Text style={styles.dispenseButtonText}>Dispense</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -83,16 +162,14 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   backButton: {
-    marginRight: 60,
+    marginRight: 10,
   },
   backButtonText: {
     color: '#fff',
     fontSize: 18,
-    alignItems: 'flex-start',
-    marginTop: 30,
   },
   userInfo: {
     flexDirection: 'row',
@@ -103,22 +180,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 20,
+    marginRight: 10,
     marginTop: 50,
   },
   userName: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#fff',
     marginTop: 50,
   },
   userDetails: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#fff',
   },
   userStatus: {
-    fontSize: 12,
-    color: '#fff',
+    fontSize: 18,
+    color: '#d3d3d3',
   },
   card: {
     backgroundColor: '#fff',
@@ -133,28 +210,38 @@ const styles = StyleSheet.create({
   },
   table: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderRadius: 5,
   },
   tableRow: {
     flexDirection: 'row',
   },
-  tableCell: {
+  timePicker: {
     flex: 1,
-    padding: 10,
-    borderRightWidth: 1,
-    borderColor: '#ccc',
+    padding: 15,
+    backgroundColor: '#d3d3d3', // Light gray to indicate it's clickable
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  daySelectionButton: {
+    backgroundColor: '#d3d3d3',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderColor: '#000',
+  },
+  inputText: {
     textAlign: 'center',
-    color: '#000',
+    fontSize: 16,
+    color: '#333',
   },
-  editButton: {
-    marginTop: 10,
-    alignItems: 'flex-end',
+  tableCell: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderColor: '#000',
+    fontSize: 16,
+    textAlign: 'center',
   },
-  editButtonText: {
-    color: '#13c2c2',
-    fontWeight: 'bold',
-  },
+
   dispenseButton: {
     backgroundColor: '#5a67d8',
     paddingVertical: 15,
@@ -165,5 +252,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  daySelection: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+
+  confirmButton: {
+    backgroundColor: '#00cdff',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
   },
 });
