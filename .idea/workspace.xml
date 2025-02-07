@@ -5,7 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4754ce6e-d347-4b06-a93a-c5d61022b0e0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Home/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/Home/Home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/UserDetails/SetSched.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/UserDetails/SetSched.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/UserDetails/UserDetailsScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/UserDetails/UserDetailsScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
