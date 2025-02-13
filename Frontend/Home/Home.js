@@ -18,6 +18,13 @@ function LoginScreen({ navigation }) {
     console.log('Username:', username);
     console.log('Password:', password);
     navigation.navigate('UserDetails');
+    if(!username) {
+      alert('Please enter your username.');
+      return;
+    } else if(!password) {
+      alert('Please enter your password.');
+      return;
+    }
   };
 
   return (
