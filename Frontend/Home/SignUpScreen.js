@@ -12,6 +12,16 @@ export default function SignUpScreen({ navigation }) {
     console.log('Email:', email);
     console.log('Password:', password);
     navigation.navigate('UserDetails'); // Navigate to User Details Screen
+    if(!username) {
+      alert('Please enter your username.');
+      return;
+    } else if(!email) {
+      alert('Please enter your email.');
+      return;
+    } else if(!password) {
+      alert('Please enter your password.');
+      return;
+    }
   };
 
   const handleGoBackHome = () => {

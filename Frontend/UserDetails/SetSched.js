@@ -8,7 +8,6 @@ import {
   Image,
   TextInput,
   ScrollView,
-  Platform,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
@@ -159,7 +158,7 @@ export default function SetSched({ route, navigation }) {
               <View>
                 <Text style={styles.userName}>{name}</Text>
                 <Text style={styles.userDetails}>
-                  {userType}, {age} years old
+                  {userType}, Age {age}
                 </Text>
                 <Text style={styles.userStatus}>Normal</Text>
               </View>
@@ -262,6 +261,8 @@ export default function SetSched({ route, navigation }) {
             )}
           </View>
 
+
+
           {/* Prescription Section 2 */}
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Prescription 2</Text>
@@ -361,6 +362,8 @@ export default function SetSched({ route, navigation }) {
               </View>
             )}
           </View>
+
+
 
           {/* Prescription Section 3 */}
           <View style={styles.card}>

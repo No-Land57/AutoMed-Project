@@ -20,10 +20,19 @@ export default function UserDetailsScreen({ navigation}) {
     navigation.navigate('SetSched', {name, age, userType,}); // Navigate to Set Schedule Screen
   };
 
-  return (
-    <LinearGradient colors={['#13c2c2', '#6b73ff']} style={styles.container}>
-      <Text style={styles.title}>User Details</Text>
+  
 
+  return (
+
+    
+    <LinearGradient colors={['#13c2c2', '#6b73ff']} style={styles.container}>
+        <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
+        <Text style={styles.backButtonText}>{"<"} Back</Text>
+        </TouchableOpacity>
+      <Text style={styles.title}>User Details</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -50,11 +59,13 @@ export default function UserDetailsScreen({ navigation}) {
       </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveDetails}>
-        <Text style={styles.saveButtonText}>Save</Text>
+        <Text style={styles.saveButtonText}>Next</Text>
       </TouchableOpacity>
     </LinearGradient>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -94,5 +105,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    padding: 10,
+  },
+  backButtonText: {
+    color: "#fff",
+    fontSize: 18,
   },
 });

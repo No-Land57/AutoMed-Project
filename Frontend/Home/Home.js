@@ -18,6 +18,13 @@ function LoginScreen({ navigation }) {
     console.log('Username:', username);
     console.log('Password:', password);
     navigation.navigate('UserDetails');
+    if(!username) {
+      alert('Please enter your username.');
+      return;
+    } else if(!password) {
+      alert('Please enter your password.');
+      return;
+    }
   };
 
   return (
@@ -31,15 +38,15 @@ function LoginScreen({ navigation }) {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Username"
-          placeholderTextColor="#d3d3d3"
+          placeholder="Username/Email"
+          placeholderTextColor="#ffffff"
           value={username}
           onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
-          placeholderTextColor="#d3d3d3"
+          placeholderTextColor="#ffffff"
           value={password}
           secureTextEntry
           onChangeText={setPassword}
@@ -124,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    height: 50,
+    height: 60,
     backgroundColor: '#ffffff33',
     borderRadius: 10,
     paddingHorizontal: 15,
