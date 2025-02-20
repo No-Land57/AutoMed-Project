@@ -7,7 +7,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpScreen from './SignUpScreen';
 import UserDetailsScreen from '../UserDetails/UserDetailsScreen';
 import SetSched from '../UserDetails/SetSched';
-import SetPasscode from '../UserDetails/SetPasscode';
+import SetPasscode from '../Security/SetPasscode';
+import FaceID from '../Security/FaceID';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +19,7 @@ function LoginScreen({ navigation }) {
   const handleLogin = () => {
     console.log('Username:', username);
     console.log('Password:', password);
-    navigation.navigate('UserDetails');
+    navigation.navigate('SetSched'); // Navigate to User Details Screen
     if(!username) {
       alert('Please enter your username.');
       return;
@@ -98,6 +99,11 @@ export default function Home() {
         <Stack.Screen
           name = "SetPasscode"
           component = {SetPasscode}
+          options = {{headerShown: false}}
+          />
+        <Stack.Screen
+          name = "FaceID"
+          component = {FaceID}
           options = {{headerShown: false}}
           />
       </Stack.Navigator>
