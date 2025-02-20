@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignUpScreen from './SignUpScreen';
 import UserDetailsScreen from '../UserDetails/UserDetailsScreen';
 import SetSched from '../UserDetails/SetSched';
+import SetPasscode from '../UserDetails/SetPasscode';
 
 const Stack = createNativeStackNavigator();
 
@@ -92,6 +93,11 @@ export default function Home() {
         <Stack.Screen
           name = "SetSched"
           component = {SetSched}
+          options = {{headerShown: false}}
+          />
+        <Stack.Screen
+          name = "SetPasscode"
+          component = {SetPasscode}
           options = {{headerShown: false}}
           />
       </Stack.Navigator>
