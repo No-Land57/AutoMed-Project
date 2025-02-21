@@ -17,7 +17,7 @@ export default function UserDetailsScreen({ navigation}) {
     }
 
     // Save data or navigate to the next screen
-    navigation.navigate('SetPasscode'); // Navigate to Set Schedule Screen
+    navigation.navigate('SetPasscode'); // Navigate to Set passcode screen
   };
 
   
