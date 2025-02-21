@@ -34,7 +34,7 @@ export default function SetPasscode({ navigation }) {
       setStep(1);
       return;
     } else{
-          // Save passcode securely
+          // Save passcode
     // await Keychain.setGenericPassword(username, passcode);  must call username from UserDetailsScreen.js, to allocate passcode to that username
   
     Alert.alert('Success', 'Passcode has been set!');
@@ -101,6 +101,8 @@ export default function SetPasscode({ navigation }) {
             </TouchableOpacity>
           ))}
         </View>
+
+
         <View style={styles.keypadRow}>
           {['4', '5', '6'].map((key) => (
             <TouchableOpacity key={key} style={styles.key} onPress={() => handleKeyPress(key)}>
@@ -108,6 +110,8 @@ export default function SetPasscode({ navigation }) {
             </TouchableOpacity>
           ))}
         </View>
+
+
         <View style={styles.keypadRow}>
           {['7', '8', '9'].map((key) => (
             <TouchableOpacity key={key} style={styles.key} onPress={() => handleKeyPress(key)}>
@@ -115,6 +119,8 @@ export default function SetPasscode({ navigation }) {
             </TouchableOpacity>
           ))}
         </View>
+
+        
         <View style={styles.keypadBottomRow}>
           <TouchableOpacity style={styles.key} onPress={() => handleKeyPress('0')}>
             <Text style={styles.keyText}>0</Text>

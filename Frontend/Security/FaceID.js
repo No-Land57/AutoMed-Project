@@ -1,15 +1,23 @@
-import React, {useState, useRef} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
-import {RNCamera} from 'react-native-camera';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Camera } from 'expo-camera';
 
-export default function FaceID({navigation}) {
+export default function FaceID({ navigation }) {
+    const [hasPermission, setHasPermission] = useState(null);
     const cameraRef = useRef(null);
     const [photos, setPhotos] = useState([]);
     const [photoCount, setPhotoCount] = useState(0);
 
+    useEffect(() => {
+        (async () => {
+            const { status } = await Camera.requestPermissionsAsync();
+            setHasPermission(status === 'granted');
+        })();
+    }, []);
+
     const takePicture = async () => {
         if (cameraRef.current) {
-            const options = {quality: 0.5, base64: true};
+            const options = { quality: 0.5, base64: true };
             const data = await cameraRef.current.takePictureAsync(options);
             const newPhotos = [...photos, data.uri];
             setPhotos(newPhotos);
@@ -22,13 +30,20 @@ export default function FaceID({navigation}) {
         }
     };
 
+    if (hasPermission === null) {
+        return <View />;
+    }
+    if (hasPermission === false) {
+        return <Text>No access to camera</Text>;
+    }
+
     return (
         <View style={styles.container}>
-            <RNCamera
+            <Camera
                 ref={cameraRef}
                 style={styles.preview}
-                type={RNCamera.Constants.Type.front}
-                flashMode={RNCamera.Constants.FlashMode.off}
+                type={Camera.Constants.Type.front}
+                flashMode={Camera.Constants.FlashMode.off}
                 captureAudio={false}
             />
             <View style={styles.captureContainer}>
@@ -43,36 +58,36 @@ export default function FaceID({navigation}) {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      flexDirection: 'column',
-      backgroundColor: 'black',
+        flex: 1,
+        flexDirection: 'column',
+        backgroundColor: 'black',
     },
     preview: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
     },
     captureContainer: {
-      flex: 0,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 20,
+        flex: 0,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
     capture: {
-      flex: 0,
-      backgroundColor: '#fff',
-      borderRadius: 5,
-      padding: 15,
-      paddingHorizontal: 20,
-      alignSelf: 'center',
-      margin: 20,
+        flex: 0,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        padding: 15,
+        paddingHorizontal: 20,
+        alignSelf: 'center',
+        margin: 20,
     },
     captureText: {
-      fontSize: 14,
+        fontSize: 14,
     },
     photoCount: {
-      color: '#fff',
-      fontSize: 18,
+        color: '#fff',
+        fontSize: 18,
     },
-  });
+});
