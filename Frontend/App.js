@@ -1,8 +1,8 @@
 import React from 'react';
-import Home from './Home/Home';
+import LoginPage from './LoginPage/Login';
 
 export default function App() {
   return (
-    <Home />
+    <LoginPage />
   );
 }
