@@ -11,7 +11,7 @@ export default function SignUpScreen({ navigation }) {
     console.log('Username:', username);
     console.log('Email:', email);
     console.log('Password:', password);
-    navigation.navigate('UserDetails'); // Navigate to User Details Screen
+    navigation.navigate('SetPasscode'); // Navigate to User Details Screen
     if(!username) {
       alert('Please enter your username.');
       return;
