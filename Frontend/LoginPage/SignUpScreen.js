@@ -6,12 +6,13 @@ export default function SignUpScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSignUp = () => {
     console.log('Username:', username);
     console.log('Email:', email);
     console.log('Password:', password);
-    navigation.navigate('SetPasscode'); // Navigate to User Details Screen
+    console.log('Confirm Password:', confirmPassword);
     if(!username) {
       alert('Please enter your username.');
       return;
@@ -21,7 +22,15 @@ export default function SignUpScreen({ navigation }) {
     } else if(!password) {
       alert('Please enter your password.');
       return;
+    } else if(password.length < 8) {
+      alert('Password must be at least 8 characters long.');
+      return;
+    } else if(confirmPassword !== password) {
+      alert('Passwords do not match.');
+      return;
     }
+    navigation.navigate('SetPasscode'); // Navigate to User Details Screen
+    
   };
 
   const handleGoBackHome = () => {
@@ -61,6 +70,14 @@ export default function SignUpScreen({ navigation }) {
           value={password}
           secureTextEntry
           onChangeText={setPassword}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          placeholderTextColor="#d3d3d3"
+          value={password}
+          secureTextEntry
+          onChangeText={confirmPassword}
         />
       </View>
 
