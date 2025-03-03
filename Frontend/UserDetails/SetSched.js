@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
+import PushNotification from "react-native-push-notification";
 
 export default function SetSched({ route, navigation }) {
   // Safely retrieve user data from UserDetailsScreen
@@ -100,8 +101,7 @@ export default function SetSched({ route, navigation }) {
       alert("Please fill out all fields.");
       return;
     }
-    alert("Medication Dispensed!");
-    navigation.goBack(); // Navigate back after dispensing
+    alert("Your medication has been set successfully!");
   };
 
   // Function to get selected days text
@@ -135,6 +135,18 @@ export default function SetSched({ route, navigation }) {
   // Function to confirm day selection
   const handleConfirmDays = () => {
     setShowDaySelection(false);
+  };
+
+  const notificationHandler = (time, days) => {
+    days.forEach((day) => {
+      const notificationTime = new Date(time);
+      PushNotification.localNotificationSchedule({
+        message: "Time to take your medication!",
+        date: notificationTime,
+        repeatType: "week",
+        allowWhileIdle: true,
+      });
+    });
   };
 
   // JSX code for rendering the component
@@ -239,11 +251,7 @@ export default function SetSched({ route, navigation }) {
                     if (event.type === "set" && selectedTime) {
                       setTempTime(selectedTime);
                       setTimePickerVisible(false);
-                      handleConfirmTime(
-                        setTime,
-                        setTimePickerVisible,
-                        selectedTime
-                      );
+                      handleConfirmTime(setTime, setTimePickerVisible, selectedTime);
                     } else {
                       setTimePickerVisible(false);
                     }
@@ -468,7 +476,12 @@ export default function SetSched({ route, navigation }) {
           {/* Dispense Button */}
           <TouchableOpacity
             style={styles.dispenseButton}
-            onPress={handleDispense}
+            onPress={() => {
+              handleDispense();
+              notificationHandler(tempTime, selectedDays);
+              notificationHandler(tempTime2, selectedDays2);
+              notificationHandler(tempTime3, selectedDays3);
+            }}
           >
             <Text style={styles.dispenseButtonText}>Dispense</Text>
           </TouchableOpacity>
