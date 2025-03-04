@@ -65,6 +65,15 @@ export default function FaceID({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={takePicture}>
           <Text style={styles.text}>Take Picture ({photoCount}/3)</Text>
         </TouchableOpacity>
+        {photoCount === 3 ? (
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SetSched')}>
+            <Text style={styles.text}>Next</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={() => alert('Please take 3 photos')}>
+            <Text style={styles.text}>Next</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

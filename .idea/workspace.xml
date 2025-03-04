@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4754ce6e-d347-4b06-a93a-c5d61022b0e0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/LoginPage/SignUpScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/LoginPage/SignUpScreen.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/App.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/App.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/Security/FaceID.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/Security/FaceID.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

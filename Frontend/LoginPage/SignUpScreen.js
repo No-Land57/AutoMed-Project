@@ -8,7 +8,7 @@ export default function SignUpScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     console.log('Username:', username);
     console.log('Email:', email);
     console.log('Password:', password);
@@ -29,8 +29,31 @@ export default function SignUpScreen({ navigation }) {
       alert('Passwords do not match.');
       return;
     }
-    navigation.navigate('SetPasscode'); // Navigate to User Details Screen
-    
+
+    try {
+      const response = await fetch('http://localhost:5000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          email: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+      if(response.status === 201) {
+        alert('Account created successfully!');
+        navigation.navigate('SetPasscode');
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to sign up');
+    }
   };
 
   const handleGoBackHome = () => {
