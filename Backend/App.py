@@ -8,7 +8,7 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(24), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128))
 
@@ -31,10 +31,6 @@ def signup():
     db.session.commit()
 
     return jsonify({'message': 'User created successfully'}), 201
-
-@app.route('/')
-def hello():
-    return "Hello, World!"
 
 if __name__ == '__main__':
     with app.app_context():
