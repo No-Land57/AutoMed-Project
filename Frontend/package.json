@@ -28,7 +28,6 @@
     "react-native-keychain": "^9.2.3",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-pincode-input": "^1.0.2",
-    "react-native-push-notification": "^8.1.1",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
