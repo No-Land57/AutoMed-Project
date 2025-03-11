@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -31,6 +32,27 @@ def signup():
     db.session.commit()
 
     return jsonify({'message': 'User created successfully'}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Both username and password are required'}), 400
+
+    user = User.query.filter_by(username=username).first()
+    if not user or user.password != password:
+        return jsonify({'error': 'Invalid username or password'}), 401
+
+    return jsonify({'message': 'Login successful'}), 200
+
+@app.route('/users', methods=['GET'])
+def users():
+    users = User.query.all()
+    users = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
+    return jsonify(users)
 
 if __name__ == '__main__':
     with app.app_context():
