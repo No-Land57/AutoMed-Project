@@ -16,10 +16,9 @@ function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log('Username:', username);
     console.log('Password:', password);
-    navigation.navigate('SetSched'); // Navigate to User Details Screen
     if(!username) {
       alert('Please enter your username.');
       return;
@@ -27,8 +26,32 @@ function LoginScreen({ navigation }) {
       alert('Please enter your password.');
       return;
     }
-  };
 
+     try {
+      const response = await fetch('http://10.0.2.2:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+      if(response.status === 200) {
+        alert('Login successful!');
+        navigation.navigate('SetSched');
+      }
+      else {
+        alert("Error: " + data.message);
+      }
+     } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to login');
+      }
+  };
   return (
     <LinearGradient colors={['#13c2c2', '#6b73ff']} style={styles.container}>
       <View style={styles.logoContainer}>

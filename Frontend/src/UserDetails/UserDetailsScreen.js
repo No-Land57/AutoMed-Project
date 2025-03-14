@@ -7,7 +7,7 @@ export default function UserDetailsScreen({ navigation}) {
   const [age, setAge] = useState('');
   const [userType, setUserType] = useState(''); // Guardian, Worker, or Patient
 
-  const handleSaveDetails = () => {
+  const handleSaveDetails = async () => {
     console.log('Name:', name);
     console.log('Age:', age);
     console.log('User Type:', userType);
@@ -15,6 +15,30 @@ export default function UserDetailsScreen({ navigation}) {
       alert('Please fill out all fileds.');
       return;
     }
+
+    try {
+      const response = await fetch('http://10.0.2.2:5000/userdetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name,
+          age: age,
+          userType: userType,
+        }),
+      });
+
+      const data = await response.json();
+      if(response.status === 201) {
+        alert('User details saved successfully!');
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to save user details');
+  };
 
     // Save data or navigate to the next screen
     navigation.navigate('SetPasscode'); // Navigate to Set passcode screen
