@@ -32,6 +32,21 @@ def signup():
 
     return jsonify({'message': 'User created successfully'}), 201
 
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Both username and password are required'}), 400
+
+    user = User.query.filter_by(username=username).first()
+    if not user or user.password != password:
+        return jsonify({'error': 'Invalid credentials'}), 401
+
+    return jsonify({'message': 'Login successful'}), 200
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
