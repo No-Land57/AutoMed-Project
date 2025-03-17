@@ -45,7 +45,7 @@ function LoginScreen({ navigation }) {
         navigation.navigate('SetSched');
       }
       else {
-        alert("Error: " + data.message);
+        alert("Message: " + data.Message);
       }
      } catch (error) {
       console.error('Error:', error);

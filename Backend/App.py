@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, logging, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -29,17 +29,21 @@ def signup():
     password = data.get('password')
 
     if not username or not email or not password:
-        return jsonify({'error': 'All fields are required'}), 400
+        return jsonify({'Message': 'All fields are required'}), 400
 
     existing_user = User.query.filter_by(username=username).first()
     if existing_user:
-        return jsonify({'error': 'Username already exists'}), 409
+        return jsonify({'Message': 'Username already exists'}), 409
+    
+    existing_email = User.query.filter_by(email=email).first()
+    if existing_email:
+        return jsonify({'Message': 'Email already exists'}), 409
 
     new_user = User(username=username, email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'message': 'User created successfully'}), 201
+    return jsonify({'Message': 'User created successfully'}), 201
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -48,13 +52,16 @@ def login():
     password = data.get('password')
 
     if not username or not password:
-        return jsonify({'error': 'Both username and password are required'}), 400
+        return jsonify({'Message': 'Both username and password are required'}), 400
 
     user = User.query.filter_by(username=username).first()
-    if not user or user.password != password:
-        return jsonify({'error': 'Invalid username or password'}), 401
+    if not user:
+        return jsonify({'Message': 'Invalid username'}), 401
+    
+    if user.password != password:
+        return jsonify({'Message': 'Invalid password'}), 401
 
-    return jsonify({'message': 'Login successful'}), 200
+    return jsonify({'Message': 'Login successful'}), 200
 
 @app.route('/userdetails', methods=['GET'])
 def userdetails():
@@ -78,6 +85,7 @@ def userdetails():
     db.session.commit()
     return jsonify({'message': 'User details updated successfully'}), 200
 
+'''
 @app.route('/SetPasscode', methods=['POST'])
 def SetPasscode():
     data = request.get_json()
@@ -99,6 +107,8 @@ def SetPasscode():
     db.session.commit()
 
     return jsonify({'message': 'Passcode set successfully'}), 201
+
+'''
  
 
 if __name__ == '__main__':
