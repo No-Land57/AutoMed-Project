@@ -15,6 +15,8 @@ export default function SetPasscode({ navigation }) {
     setValue: step === 1 ? setPasscode : setConfirmPasscode,
   });
 
+  
+
   const handleSetPasscode = () => {
     if (passcode.length !== 6) {
       Alert.alert('Error', 'Passcode must be 6 digits.');
@@ -32,11 +34,31 @@ export default function SetPasscode({ navigation }) {
       setPasscode('');
       setConfirmPasscode('');
       setStep(1);
-      return;
+      
     } else{
-          // Save passcode
-    // await Keychain.setGenericPassword(username, passcode);  must call username from UserDetailsScreen.js, to allocate passcode to that username
+
+      try {
+        const response = await fetch('http://192.168.0.240:5000/SetPasscode', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            passcode: confirmPasscode,
+          }),
+        });
   
+        const data = await response.json();
+        if(response.status === 201) {
+          alert('Passcode set successfully!');
+          navigation.navigate('FaceID'); // Navigate to FaceID screen
+        } else {
+          alert("Message: " + data.message);
+        }
+      } catch (error) {
+        console.error('Error setting passcode:', error);
+        alert('Failed to set passcode. Please try again.');
+      }
     Alert.alert('Success', 'Passcode has been set!');
     }
   };
@@ -58,29 +80,6 @@ export default function SetPasscode({ navigation }) {
       setPasscode(passcode.slice(0, -1));
     } else {
       setConfirmPasscode(confirmPasscode.slice(0, -1));
-    }
-
-    try {
-      const response = await fetch('http://10.0.2.2:5000/Set_Passcode', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          passcode: passcode,
-        }),
-      });
-
-      const data = await response.json();
-      if(response.status === 201) {
-        alert('Passcode set successfully!');
-        navigation.navigate('FaceID'); // Navigate to FaceID screen
-      } else {
-        alert("Message: " + data.message);
-      }
-    } catch (error) {
-      console.error('Error setting passcode:', error);
-      alert('Failed to set passcode. Please try again.');
     }
 
   };

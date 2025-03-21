@@ -1,11 +1,14 @@
-from flask import Flask, logging, request, jsonify
+from flask import Flask, logging, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'secret_key'
 db = SQLAlchemy(app)
+
 
 class User(db.Model):
     #signup/login
@@ -89,14 +92,17 @@ def userdetails():
     return jsonify({'message': 'User details updated successfully'}), 200
 
 
-@app.route('/Set_Passcode', methods=['POST'])
+@app.route('/SetPasscode', methods=['POST'])
 def SetPasscode():
     data = request.get_json()
-    username = data.get('username')
     passcode = data.get('passcode')
     
     if len(passcode) != 6 or not passcode.isdigit():
         return jsonify({'error': 'Passcode must be 6 digits'}), 400
+    
+    username = session.get('username')
+    if not username:
+        return jsonify({'error': 'User not authenticated'}), 401
     
     user = User.query.filter_by(username=username).first()
     if not user:
@@ -108,9 +114,6 @@ def SetPasscode():
 
     return jsonify({'Message': 'Passcode set successfully'}), 201
 
-
-
- 
 
 if __name__ == '__main__':
     with app.app_context():
