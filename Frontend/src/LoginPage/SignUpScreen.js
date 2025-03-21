@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView} from 'react-native';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function SignUpScreen({ navigation }) {
@@ -65,7 +66,9 @@ export default function SignUpScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient colors={['#13c2c2', '#6b73ff']} style={styles.container}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <LinearGradient colors={['#13c2c2', '#6b73ff']} style={styles.container}>
       <View style={styles.logoContainer}>
         <Image source={require('../../assets/pill.png')} style={styles.logo} />
       </View>
@@ -113,6 +116,8 @@ export default function SignUpScreen({ navigation }) {
         <Text style={styles.goBackButtonText}>Home</Text>
       </TouchableOpacity>
     </LinearGradient>
+    </ScrollView>
+    </GestureHandlerRootView>
   );
 }
 
@@ -178,4 +183,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
+
 });

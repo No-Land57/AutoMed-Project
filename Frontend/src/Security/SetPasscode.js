@@ -38,7 +38,6 @@ export default function SetPasscode({ navigation }) {
     // await Keychain.setGenericPassword(username, passcode);  must call username from UserDetailsScreen.js, to allocate passcode to that username
   
     Alert.alert('Success', 'Passcode has been set!');
-    navigation.navigate('FaceID'); // Navigate to FaceID screen
     }
   };
 
@@ -54,12 +53,36 @@ export default function SetPasscode({ navigation }) {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (step === 1) {
       setPasscode(passcode.slice(0, -1));
     } else {
       setConfirmPasscode(confirmPasscode.slice(0, -1));
     }
+
+    try {
+      const response = await fetch('http://10.0.2.2:5000/Set_Passcode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          passcode: passcode,
+        }),
+      });
+
+      const data = await response.json();
+      if(response.status === 201) {
+        alert('Passcode set successfully!');
+        navigation.navigate('FaceID'); // Navigate to FaceID screen
+      } else {
+        alert("Message: " + data.message);
+      }
+    } catch (error) {
+      console.error('Error setting passcode:', error);
+      alert('Failed to set passcode. Please try again.');
+    }
+
   };
 
   return (

@@ -20,6 +20,9 @@ class User(db.Model):
     age = db.Column(db.Integer)
     userType = db.Column(db.String(120))
 
+#import SetSched
+#from SetSched import set_sched
+#app.register_blueprint(set_sched)
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -85,15 +88,12 @@ def userdetails():
     db.session.commit()
     return jsonify({'message': 'User details updated successfully'}), 200
 
-'''
-@app.route('/SetPasscode', methods=['POST'])
+
+@app.route('/Set_Passcode', methods=['POST'])
 def SetPasscode():
     data = request.get_json()
     username = data.get('username')
     passcode = data.get('passcode')
-    
-    if not username or not passcode:
-        return jsonify({'error': 'Missing username or passcode'}), 400
     
     if len(passcode) != 6 or not passcode.isdigit():
         return jsonify({'error': 'Passcode must be 6 digits'}), 400
@@ -106,9 +106,8 @@ def SetPasscode():
     user.passcode = passcode
     db.session.commit()
 
-    return jsonify({'message': 'Passcode set successfully'}), 201
+    return jsonify({'Message': 'Passcode set successfully'}), 201
 
-'''
  
 
 if __name__ == '__main__':
