@@ -50,8 +50,22 @@ export default function SetSched({ route, navigation }) {
         return;
       }
     }
-    alert("Medication Dispensed!");
-    navigation.goBack();
+
+    alert("Medication has been set!");
+
+    // save data try catch block
+    // try {
+    //   const response = await fetch("http://
+    //
+    //   if (response.status === 201) {
+    //     alert("Medication has been set!");
+    //   } else {
+    //     alert("Error: " + data.message);
+    //   }
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   alert("Failed to set medication");
+    // }
   };
 
   const getSelectedDaysText = (selectedDays) => {

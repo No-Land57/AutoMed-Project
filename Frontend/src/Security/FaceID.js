@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     height: '60%', // Height of the oval
     borderRadius: 100, // Makes it an oval
     borderWidth: 3,
-    borderColor: 'rgb(18, 128, 46)', // White semi-transparent border
+    borderColor: 'rgb(30, 206, 74)', // White semi-transparent border
     alignSelf: 'center',
   },
   buttonContainer: {

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, TextInput } from 'react-native';
-import * as Keychain from 'react-native-keychain';
 import { useBlurOnFulfill, useClearByFocusCell } from 'react-native-confirmation-code-field';
 
 const CELL_COUNT = 6;
@@ -34,11 +33,10 @@ export default function SetPasscode({ navigation }) {
       setPasscode('');
       setConfirmPasscode('');
       setStep(1);
-      
     } else{
 
       try {
-        const response = await fetch('http://192.168.0.240:5000/SetPasscode', {
+        const response = await fetch('http://10.0.2.2:5000/SetPasscode', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -59,7 +57,6 @@ export default function SetPasscode({ navigation }) {
         console.error('Error setting passcode:', error);
         alert('Failed to set passcode. Please try again.');
       }
-    Alert.alert('Success', 'Passcode has been set!');
     }
   };
 
