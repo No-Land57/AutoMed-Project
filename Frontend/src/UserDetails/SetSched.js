@@ -13,7 +13,40 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function SetSched({ route, navigation }) {
-  const { name = "Unknown", age = "N/A", userType = "N/A" } = route?.params || {};
+  const [userDetails, setUserDetails] = useState({
+    name: 'Unknown',
+    age: 'N/A',
+    userType: 'N/A'
+  });
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch('http://10.0.2.2:5000/userdetails', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUserDetails({
+          name: data.name,
+          age: data.age ? String(data.age) : 'N/A',  // Ensure age is a string or 'N/A'
+          userType: data.userType
+        });
+      } catch (error) {
+        console.error('Failed to fetch user details:', error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   const [prescriptions, setPrescriptions] = useState([
     { drug: "", dose: "", time: "", selectedDays: [], isTimePickerVisible: false, tempTime: new Date() },
@@ -90,8 +123,8 @@ export default function SetSched({ route, navigation }) {
             <View style={styles.userInfo}>
               <Image source={require("../../assets/profile.png")} style={styles.profileImage} />
               <View>
-                <Text style={styles.userName}>{name}</Text>
-                <Text style={styles.userDetails}>{userType}, Age {age}</Text>
+                <Text style={styles.userName}>{userDetails.name}</Text>
+                <Text style={styles.userDetails}>{userDetails.userType}, Age {userDetails.age}</Text>
               </View>
             </View>
           </View>
