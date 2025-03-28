@@ -8,7 +8,7 @@ import SignUpScreen from './SignUpScreen';
 import UserDetailsScreen from '../UserDetails/UserDetailsScreen';
 import SetSched from '../UserDetails/SetSched';
 import SetPasscode from '../Security/SetPasscode';
-import FaceID from '../Security/FaceID';
+import SetFaceID from '../Security/SetFaceID';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +33,7 @@ function LoginScreen({ navigation }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           username: username,
           password: password,
@@ -125,8 +126,8 @@ export default function Home() {
           options = {{headerShown: false}}
           />
         <Stack.Screen
-          name = "FaceID"
-          component = {FaceID}
+          name = "SetFaceID"
+          component = {SetFaceID}
           options = {{headerShown: false}}
           />
       </Stack.Navigator>

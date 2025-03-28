@@ -43,7 +43,7 @@ export default function SetSched({ route, navigation }) {
     });
   };
 
-  const handleDispense = () => {
+  const handleDispense = async () => {
     for (const { drug, dose, selectedDays, time } of prescriptions) {
       if (!drug || !dose || selectedDays.length === 0 || !time) {
         alert("Please fill out all fields.");
@@ -51,21 +51,27 @@ export default function SetSched({ route, navigation }) {
       }
     }
 
-    alert("Medication has been set!");
+    try {
+      const response = await fetch("http://10.0.2.2:5000/SetSched", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ prescriptions }),
+      });
 
-    // save data try catch block
-    // try {
-    //   const response = await fetch("http://
-    //
-    //   if (response.status === 201) {
-    //     alert("Medication has been set!");
-    //   } else {
-    //     alert("Error: " + data.message);
-    //   }
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   alert("Failed to set medication");
-    // }
+      const data = await response.json();
+
+      if (response.status === 201) {
+        alert("Medication has been set!");
+    } else {
+      alert("message: " + data.message);
+    }
+  } catch (error) {
+      alert("An error occurred. Please try again.");
+      console.error(error);
+  }
   };
 
   const getSelectedDaysText = (selectedDays) => {
@@ -86,7 +92,6 @@ export default function SetSched({ route, navigation }) {
               <View>
                 <Text style={styles.userName}>{name}</Text>
                 <Text style={styles.userDetails}>{userType}, Age {age}</Text>
-                <Text style={styles.userStatus}>Normal</Text>
               </View>
             </View>
           </View>
@@ -172,7 +177,7 @@ export default function SetSched({ route, navigation }) {
           ))}
 
           <TouchableOpacity style={styles.dispenseButton} onPress={handleDispense}>
-            <Text style={styles.dispenseButtonText}>Dispense</Text>
+            <Text style={styles.dispenseButtonText}>Set Schedule!</Text>
           </TouchableOpacity>
         </ScrollView>
       </LinearGradient>
@@ -222,10 +227,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#fff",
   },
-  userStatus: {
-    fontSize: 18,
-    color: "#d3d3d3",
-  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   dispenseButton: {
-    backgroundColor: "#5a67d8",
+    backgroundColor: "#3c48b0",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",

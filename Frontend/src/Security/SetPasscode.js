@@ -41,6 +41,7 @@ export default function SetPasscode({ navigation }) {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({
             passcode: confirmPasscode,
           }),
@@ -49,7 +50,7 @@ export default function SetPasscode({ navigation }) {
         const data = await response.json();
         if(response.status === 201) {
           alert('Passcode set successfully!');
-          navigation.navigate('FaceID'); // Navigate to FaceID screen
+          navigation.navigate('SetFaceID'); // Navigate to FaceID screen
         } else {
           alert("Message: " + data.message);
         }

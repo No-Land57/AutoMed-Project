@@ -37,6 +37,7 @@ export default function SignUpScreen({ navigation }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           username: username,
           email: email,

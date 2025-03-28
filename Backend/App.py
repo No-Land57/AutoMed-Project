@@ -1,14 +1,18 @@
-from flask import Flask, logging, request, jsonify, session
+from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from flask_session import Session
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret_key'
-db = SQLAlchemy(app)
+app.config['SESSION_TYPE'] = 'filesystem'
 
+Session(app)
+CORS(app, supports_credentials=True)
+
+db = SQLAlchemy(app)
 
 class User(db.Model):
     #signup/login
@@ -23,9 +27,13 @@ class User(db.Model):
     age = db.Column(db.Integer)
     userType = db.Column(db.String(120))
 
-#import SetSched
-#from SetSched import set_sched
-#app.register_blueprint(set_sched)
+class Prescription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(24), db.ForeignKey('user.username'), nullable=False) #links to the user
+    drug = db.Column(db.String(120))
+    dose = db.Column(db.String(120),nullable=False)
+    time = db.Column(db.String(120),nullable=False)
+    selectedDays = db.Column(db.String(120),nullable=False)
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -35,21 +43,23 @@ def signup():
     password = data.get('password')
 
     if not username or not email or not password:
-        return jsonify({'Message': 'All fields are required'}), 400
+        return jsonify({'message': 'All fields are required'}), 400
 
     existing_user = User.query.filter_by(username=username).first()
     if existing_user:
-        return jsonify({'Message': 'Username already exists'}), 409
+        return jsonify({'message': 'Username already exists'}), 409
     
     existing_email = User.query.filter_by(email=email).first()
     if existing_email:
-        return jsonify({'Message': 'Email already exists'}), 409
+        return jsonify({'message': 'Email already exists'}), 409
 
     new_user = User(username=username, email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'Message': 'User created successfully'}), 201
+    session['username'] = username
+
+    return jsonify({'message': 'User created successfully'}), 201
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -58,39 +68,42 @@ def login():
     password = data.get('password')
 
     if not username or not password:
-        return jsonify({'Message': 'Both username and password are required'}), 400
+        return jsonify({'message': 'Both username and password are required'}), 400
 
     user = User.query.filter_by(username=username).first()
     if not user:
-        return jsonify({'Message': 'Invalid username'}), 401
+        return jsonify({'message': 'Invalid username'}), 401
     
     if user.password != password:
-        return jsonify({'Message': 'Invalid password'}), 401
-
-    return jsonify({'Message': 'Login successful'}), 200
-
-@app.route('/userdetails', methods=['GET'])
-def userdetails():
-    data = request.get_json()
-    username = data.get('username')
-    name = data.get('name')
-    age = data.get('age')
-    userType = data.get('userType')
-
-    if not username or not name or not age or not userType:
-        return jsonify({'error': 'All fields are required'}), 400
+        return jsonify({'message': 'Invalid password'}), 401
     
-    user = User.query.filter_by(username=username).first()
+    session['username'] = username
+
+    return jsonify({'message': 'Login successful'}), 200
+
+@app.route('/userdetails', methods=['GET', 'POST'])
+def user_details():
+    if 'username' not in session:
+        return jsonify({'error': 'Authentication required'}), 403
+
+    user = User.query.filter_by(username=session['username']).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
+
+    if request.method == 'POST':
+        data = request.get_json()
+        user.name = data.get('name', user.name)
+        user.age = data.get('age', user.age)
+        user.userType = data.get('userType', user.userType)
+        db.session.commit()
+        return jsonify({'message': 'User details updated successfully'}), 200
     
-    user.name = name
-    user.age = age
-    user.userType = userType
-
-    db.session.commit()
-    return jsonify({'message': 'User details updated successfully'}), 200
-
+    elif request.method == 'GET':
+        return jsonify({
+            'name': user.name if user.name else "N/A",
+            'age': user.age if user.age else "N/A",
+            'userType': user.userType if user.userType else "N/A"
+        }), 200
 
 @app.route('/SetPasscode', methods=['POST'])
 def SetPasscode():
@@ -112,8 +125,32 @@ def SetPasscode():
     user.passcode = passcode
     db.session.commit()
 
-    return jsonify({'Message': 'Passcode set successfully'}), 201
+    return jsonify({'message': 'Passcode set successfully'}), 201
 
+@app.route('/SetSched', methods=['POST'])
+def SetSched():
+    if 'username' not in session:
+        return jsonify({'message': 'Authentication required'}), 403
+
+    prescriptions = request.get_json().get('prescriptions', [])
+    if not prescriptions:
+        return jsonify({'message': 'No prescriptions provided'}), 400
+
+    for pres in prescriptions:
+        if not all(pres.get(key) for key in ['drug', 'dose', 'time', 'selectedDays']):
+            return jsonify({'message': 'Missing fields in prescription'}), 400
+
+        new_prescription = Prescription(
+            username=session['username'],
+            drug=pres['drug'],
+            dose=pres['dose'],
+            time=pres['time'],
+            selectedDays=",".join(pres['selectedDays'])  # Store as comma-separated string
+        )
+        db.session.add(new_prescription)
+
+    db.session.commit()
+    return jsonify({'message': 'Prescriptions updated successfully'}), 201
 
 if __name__ == '__main__':
     with app.app_context():
