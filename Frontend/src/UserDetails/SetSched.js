@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   View,
@@ -22,7 +22,7 @@ export default function SetSched({ route, navigation }) {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch('http://10.0.2.2:5000/userdetails', {
+        const response = await fetch('http://192.168.0.240:5000/userdetails', {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -85,7 +85,7 @@ export default function SetSched({ route, navigation }) {
     }
 
     try {
-      const response = await fetch("http://10.0.2.2:5000/SetSched", {
+      const response = await fetch("http://192.168.0.240:5000/SetSched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

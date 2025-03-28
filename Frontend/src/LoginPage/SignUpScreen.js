@@ -32,7 +32,7 @@ export default function SignUpScreen({ navigation }) {
     }
 
     try {
-      const response = await fetch('http://10.0.2.2:5000/signup', {
+      const response = await fetch('http://192.168.0.240:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export default function SignUpScreen({ navigation }) {
       const data = await response.json();
       if(response.status === 201) {
         alert('Account created successfully!');
-        navigation.navigate('SetPasscode');
+        navigation.navigate('UserDetails'); // Navigate to UserDetails screen after successful sign up
       } else {
         alert("Message: " + data.message);
       }
