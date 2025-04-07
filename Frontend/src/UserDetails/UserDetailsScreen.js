@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -6,34 +6,35 @@ export default function UserDetailsScreen({ navigation}) {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [userType, setUserType] = useState(''); // Guardian, Worker, or Patient
+  const [fetchData, setFetchData] = useState(false);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await fetch('http://10.0.2.2:5000/userdetails', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+    if (fetchData) {  // Only fetch data if fetchData is true
+      const fetchUserDetails = async () => {
+        try {
+          const response = await fetch('http://192.168.0.240:5000/userdetails', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          setName(data.name);
+          setAge(data.age ? String(data.age) : 'N/A');
+          setUserType(data.userType);
+        } catch (error) {
+          console.error('Failed to fetch user details:', error);
         }
-
-        const data = await response.json();
-        setUserDetails({
-          name: data.name,
-          age: data.age ? String(data.age) : 'N/A',  // Ensure age is a string or 'N/A'
-          userType: data.userType
-        });
-      } catch (error) {
-        console.error('Failed to fetch user details:', error);
-      }
-    };
-    fetchUserDetails();
-  }, []);
+      };
+      fetchUserDetails();
+    }
+  }, [fetchData]);  // Depend on the fetchData flag
 
   const handleSaveDetails = async () => {
     console.log('Name:', name);

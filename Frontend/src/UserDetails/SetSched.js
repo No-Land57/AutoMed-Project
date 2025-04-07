@@ -19,65 +19,6 @@ export default function SetSched({ route, navigation }) {
     userType: 'N/A'
   });
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await fetch('http://192.168.0.240:5000/userdetails', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setUserDetails({
-          name: data.name,
-          age: data.age ? String(data.age) : 'N/A',  // Ensure age is a string or 'N/A'
-          userType: data.userType
-        });
-      } catch (error) {
-        console.error('Failed to fetch user details:', error);
-      }
-    };
-
-    const fetchPrescriptions = async () => {
-      try {
-        const response = await fetch("http://10.0.2.2:5000/SetSched", {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if(response.ok) {
-          const data = await response.json();
-          const padded = [...data.prescriptions];
-          while (padded.length < 3) {
-            padded.push({ drug: "", dose: "", time: "", selectedDays: [] });
-          }
-          setPrescriptions(padded.map((p) => ({
-            ...p,
-            isTimePickerVisible: false,
-            tempTime: new Date(),
-          }))
-        );
-        } else {
-          console.error("Failed to load prescriptions:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching prescriptions:", error);
-    }
-  };
-    fetchPrescriptions();
-    fetchUserDetails();
-  }, []);
-
   const [prescriptions, setPrescriptions] = useState([
     { drug: "", dose: "", time: "", selectedDays: [], isTimePickerVisible: false, tempTime: new Date() },
     { drug: "", dose: "", time: "", selectedDays: [], isTimePickerVisible: false, tempTime: new Date() },
@@ -85,6 +26,63 @@ export default function SetSched({ route, navigation }) {
   ]);
 
   const daysOfWeek = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
+
+useEffect(() => {
+  const fetchUserDetails = async () => {
+    try {
+      const response = await fetch('http://192.168.0.240:5000/userdetails', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUserDetails({
+        name: data.name,
+        age: data.age ? String(data.age) : 'N/A',
+        userType: data.userType
+      });
+
+      // After successful user details fetch, check for prescriptions
+      fetchPrescriptions();  // This should ideally be based on an actual condition or flag
+    } catch (error) {
+      console.error('Failed to fetch user details:', error);
+    }
+  };
+
+  fetchUserDetails();
+}, []);
+
+const fetchPrescriptions = async () => {
+  try {
+    const response = await fetch("http://192.168.0.240:5000/GetSched", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const prescriptionsData = await response.json();
+      setPrescriptions(prescriptionsData.map(pres => ({
+        ...pres,
+        isTimePickerVisible: false,
+        tempTime: new Date(pres.time),
+      })));
+    } else {
+      console.error("Failed to load prescriptions:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error fetching prescriptions:", error);
+  }
+};
 
   const toggleDaySelection = (index, day) => {
     setPrescriptions((prev) => {
@@ -263,12 +261,13 @@ const styles = StyleSheet.create({
   },
   LogoutButton: {
     backgroundColor: '#ff6f61',
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
     marginBottom: 10,
+    marginTop: 10,
   },
   LogoutButtonText: {
     color: '#fff',
