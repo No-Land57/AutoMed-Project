@@ -45,6 +45,36 @@ export default function SetSched({ route, navigation }) {
       }
     };
 
+    const fetchPrescriptions = async () => {
+      try {
+        const response = await fetch("http://10.0.2.2:5000/SetSched", {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if(response.ok) {
+          const data = await response.json();
+          const padded = [...data.prescriptions];
+          while (padded.length < 3) {
+            padded.push({ drug: "", dose: "", time: "", selectedDays: [] });
+          }
+          setPrescriptions(padded.map((p) => ({
+            ...p,
+            isTimePickerVisible: false,
+            tempTime: new Date(),
+          }))
+        );
+        } else {
+          console.error("Failed to load prescriptions:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching prescriptions:", error);
+    }
+  };
+    fetchPrescriptions();
     fetchUserDetails();
   }, []);
 
@@ -117,9 +147,6 @@ export default function SetSched({ route, navigation }) {
       <LinearGradient colors={["#13c2c2", "#6b73ff"]} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-              <Text style={styles.backButtonText}>{"<"} Back</Text>
-            </TouchableOpacity>
             <View style={styles.userInfo}>
               <Image source={require("../../assets/profile.png")} style={styles.profileImage} />
               <View>
@@ -212,6 +239,9 @@ export default function SetSched({ route, navigation }) {
           <TouchableOpacity style={styles.dispenseButton} onPress={handleDispense}>
             <Text style={styles.dispenseButtonText}>Set Schedule!</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.LogoutButton}>
+              <Text style={styles.LogoutButtonText}>Logout</Text>
+            </TouchableOpacity>
         </ScrollView>
       </LinearGradient>
     </GestureHandlerRootView>
@@ -231,12 +261,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  backButton: {
-    marginRight: 10,
+  LogoutButton: {
+    backgroundColor: '#ff6f61',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  backButtonText: {
-    color: "#fff",
-    fontSize: 18,
+  LogoutButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   userInfo: {
     flexDirection: "row",

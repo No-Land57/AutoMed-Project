@@ -7,6 +7,34 @@ export default function UserDetailsScreen({ navigation}) {
   const [age, setAge] = useState('');
   const [userType, setUserType] = useState(''); // Guardian, Worker, or Patient
 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch('http://10.0.2.2:5000/userdetails', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUserDetails({
+          name: data.name,
+          age: data.age ? String(data.age) : 'N/A',  // Ensure age is a string or 'N/A'
+          userType: data.userType
+        });
+      } catch (error) {
+        console.error('Failed to fetch user details:', error);
+      }
+    };
+    fetchUserDetails();
+  }, []);
+
   const handleSaveDetails = async () => {
     console.log('Name:', name);
     console.log('Age:', age);
@@ -40,23 +68,14 @@ export default function UserDetailsScreen({ navigation}) {
       console.error('Error:', error);
       alert('Failed to save user details');
   };
-
     // Save data or navigate to the next screen
     navigation.navigate('SetPasscode'); // Navigate to Set passcode screen
   };
-
-  
 
   return (
 
     
     <LinearGradient colors={['#13c2c2', '#6b73ff']} style={styles.container}>
-        <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={styles.backButton}
-      >
-        <Text style={styles.backButtonText}>{"<"} Back</Text>
-        </TouchableOpacity>
       <Text style={styles.title}>User Details</Text>
       <View style={styles.inputContainer}>
         <TextInput
@@ -130,15 +149,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    padding: 10,
-  },
-  backButtonText: {
-    color: "#fff",
-    fontSize: 18,
   },
 });

@@ -152,6 +152,26 @@ def SetSched():
     db.session.commit()
     return jsonify({'message': 'Prescriptions updated successfully'}), 201
 
+@app.route('/GetSched', methods=['GET'])
+def GetSched():
+    if 'username' not in session:
+        return jsonify({'message': 'Authentication required'}), 403
+
+    prescriptions = Prescription.query.filter_by(username=session['username']).all()
+    if not prescriptions:
+        return jsonify({'message': 'No prescriptions found'}), 404
+
+    schedule = []
+    for pres in prescriptions:
+        schedule.append({
+            'drug': pres.drug,
+            'dose': pres.dose,
+            'time': pres.time,
+            'selectedDays': pres.selectedDays.split(",")  # Convert back to list
+        })
+
+    return jsonify(schedule), 200
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
