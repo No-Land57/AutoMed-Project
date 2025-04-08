@@ -19,6 +19,8 @@ export default function SetSched({ route, navigation }) {
     userType: 'N/A'
   });
 
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
   const [prescriptions, setPrescriptions] = useState([
     { drug: "", dose: "", time: "", selectedDays: [], isTimePickerVisible: false, tempTime: new Date() },
     { drug: "", dose: "", time: "", selectedDays: [], isTimePickerVisible: false, tempTime: new Date() },
@@ -30,7 +32,7 @@ export default function SetSched({ route, navigation }) {
 useEffect(() => {
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch('http://192.168.0.240:5000/userdetails', {
+      const response = await fetch('http://10.0.2.2:5000/userdetails', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -61,7 +63,7 @@ useEffect(() => {
 
 const fetchPrescriptions = async () => {
   try {
-    const response = await fetch("http://192.168.0.240:5000/GetSched", {
+    const response = await fetch("http://10.0.2.2:5000/GetSched", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -71,13 +73,19 @@ const fetchPrescriptions = async () => {
 
     if (response.ok) {
       const prescriptionsData = await response.json();
+
+      if (prescriptionsData.length === 0) {
+        return;
+      }
+      
       setPrescriptions(prescriptionsData.map(pres => ({
         ...pres,
         isTimePickerVisible: false,
         tempTime: new Date(pres.time),
       })));
     } else {
-      console.error("Failed to load prescriptions:", response.statusText);
+      return
+      //console.error("Failed to load prescriptions:", response.statusText);
     }
   } catch (error) {
     console.error("Error fetching prescriptions:", error);
@@ -105,15 +113,26 @@ const fetchPrescriptions = async () => {
   };
 
   const handleDispense = async () => {
-    for (const { drug, dose, selectedDays, time } of prescriptions) {
-      if (!drug || !dose || selectedDays.length === 0 || !time) {
-        alert("Please fill out all fields.");
-        return;
-      }
+  // Check if all prescriptions are empty
+  const allEmpty = prescriptions.every(({ drug, dose, selectedDays, time }) => 
+    !drug && !dose && selectedDays.length === 0 && !time
+  );
+
+  if (allEmpty) {
+    alert("Please fill out at least one prescription.");
+    return;
+  }
+
+  // Validate each filled prescription
+  for (const { drug, dose, selectedDays, time } of prescriptions) {
+    if ((drug || dose || selectedDays.length > 0 || time) && (!drug || !dose || selectedDays.length === 0 || !time)) {
+      alert("Please fill out all fields for each filled prescription.");
+      return;
     }
+  }
 
     try {
-      const response = await fetch("http://192.168.0.240:5000/SetSched", {
+      const response = await fetch("http://10.0.2.2:5000/SetSched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,6 +172,38 @@ const fetchPrescriptions = async () => {
               </View>
             </View>
           </View>
+
+            {/* Dropdown Button */}
+            <TouchableOpacity
+              style={styles.dropdownButton}
+              onPress={() => setIsDropdownVisible(!isDropdownVisible)}
+            >
+              <Text style={styles.dropdownButtonText}>Options</Text>
+            </TouchableOpacity>
+
+            {/* Dropdown Menu */}
+            {isDropdownVisible && (
+              <View style={styles.dropdownMenu}>
+                <TouchableOpacity
+      style={styles.dropdownMenuItem}
+      onPress={() => {
+        setIsDropdownVisible(false); // Close the dropdown
+        navigation.navigate('UserDetailsScreen'); // Navigate to UserDetailsScreen
+      }}
+    >
+                  <Text style={styles.dropdownMenuItemText}>Update User Details</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+      style={styles.dropdownMenuItem}
+      onPress={() => {
+        setIsDropdownVisible(false); // Close the dropdown
+        navigation.navigate('SetPasscode'); // Navigate to SetPasscode
+      }}
+    >
+                  <Text style={styles.dropdownMenuItemText}>Update Passcode</Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
           {prescriptions.map((prescription, index) => (
             <View key={index} style={styles.card}>
@@ -231,6 +282,20 @@ const fetchPrescriptions = async () => {
                   </TouchableOpacity>
                 </View>
               )}
+                  <TouchableOpacity
+      style={styles.clearButton}
+      onPress={() =>
+        setPrescriptions((prev) =>
+          prev.map((p, i) =>
+            i === index
+              ? { drug: "", dose: "", time: "", selectedDays: [], isTimePickerVisible: false, tempTime: new Date() }
+              : p
+          )
+        )
+      }
+    >
+      <Text style={styles.clearButtonText}>Clear</Text>
+    </TouchableOpacity>
             </View>
           ))}
 
@@ -379,5 +444,53 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: "#000",
     fontSize: 16,
+  },
+  dropdownButton: {
+    position: "absolute",
+    top: 55, // Adjust the vertical position
+    right: 20, // Align to the right
+    backgroundColor: "#fff",
+    padding: 8, // Reduce padding to make it smaller
+    borderRadius: 5,
+    elevation: 3, // Add a slight shadow for better visibility
+  },
+  dropdownButtonText: {
+    color: "#333",
+    fontSize: 14, // Reduce font size
+    fontWeight: "bold",
+  },
+  dropdownMenu: {
+    position: "absolute",
+    top: 95, // Adjust dropdown position relative to the button
+    right: 20, // Align to the right
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  dropdownMenuItem: {
+    padding: 8, // Reduce padding for smaller items
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  dropdownMenuItemText: {
+    fontSize: 14, // Reduce font size
+    color: "#333",
+  },
+  clearButton: {
+    backgroundColor: "crimson",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  clearButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

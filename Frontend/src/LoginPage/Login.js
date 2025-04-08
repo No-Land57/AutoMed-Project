@@ -1,18 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import SignUpScreen from './SignUpScreen';
-import UserDetailsScreen from '../UserDetails/UserDetailsScreen';
-import SetSched from '../UserDetails/SetSched';
-import SetPasscode from '../Security/SetPasscode';
-import SetFaceID from '../Security/SetFaceID';
 
-const Stack = createNativeStackNavigator();
-
-function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -28,7 +19,7 @@ function LoginScreen({ navigation }) {
     }
 
      try {
-      const response = await fetch('http://192.168.0.240:5000/login', {
+      const response = await fetch('http://10.0.2.2:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,45 +84,6 @@ function LoginScreen({ navigation }) {
         </Text>
       </Text>
     </LinearGradient>
-  );
-}
-
-export default function Home() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="SignUp"
-          component={SignUpScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="UserDetails"
-          component={UserDetailsScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name = "SetSched"
-          component = {SetSched}
-          options = {{headerShown: false}}
-          />
-        <Stack.Screen
-          name = "SetPasscode"
-          component = {SetPasscode}
-          options = {{headerShown: false}}
-          />
-        <Stack.Screen
-          name = "SetFaceID"
-          component = {SetFaceID}
-          options = {{headerShown: false}}
-          />
-      </Stack.Navigator>
-    </NavigationContainer>
   );
 }
 
