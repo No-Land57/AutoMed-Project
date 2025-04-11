@@ -5,20 +5,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function SignUpScreen({ navigation }) {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSignUp = async () => {
     console.log('Username:', username);
-    console.log('Email:', email);
     console.log('Password:', password);
     console.log('Confirm Password:', confirmPassword);
     if(!username) {
       alert('Please enter your username.');
-      return;
-    } else if(!email) {
-      alert('Please enter your email.');
       return;
     } else if(!password) {
       alert('Please enter your password.');
@@ -32,7 +27,7 @@ export default function SignUpScreen({ navigation }) {
     }
 
     try {
-      const response = await fetch('http://10.0.2.2:5000/signup', {
+      const response = await fetch('http://192.168.0.240:5000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +35,6 @@ export default function SignUpScreen({ navigation }) {
         credentials: 'include',
         body: JSON.stringify({
           username: username,
-          email: email,
           password: password,
         }),
       });
@@ -82,13 +76,6 @@ export default function SignUpScreen({ navigation }) {
           placeholderTextColor="#d3d3d3"
           value={username}
           onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#d3d3d3"
-          value={email}
-          onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}

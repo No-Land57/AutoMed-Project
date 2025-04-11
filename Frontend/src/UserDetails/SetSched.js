@@ -32,7 +32,7 @@ export default function SetSched({ route, navigation }) {
 useEffect(() => {
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:5000/userdetails', {
+      const response = await fetch('http://192.168.0.240:5000/userdetails', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -63,7 +63,7 @@ useEffect(() => {
 
 const fetchPrescriptions = async () => {
   try {
-    const response = await fetch("http://10.0.2.2:5000/GetSched", {
+    const response = await fetch("http://192.168.0.240:5000/GetSched", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -132,7 +132,7 @@ const fetchPrescriptions = async () => {
   }
 
     try {
-      const response = await fetch("http://10.0.2.2:5000/SetSched", {
+      const response = await fetch("http://192.168.0.240:5000/SetSched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
