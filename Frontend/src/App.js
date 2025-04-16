@@ -9,7 +9,7 @@ import UserDetailsScreen from './UserDetails/UserDetailsScreen';
 import SetSched from './UserDetails/SetSched';
 import SetPasscode from './Security/SetPasscode';
 import SetFaceID from './Security/SetFaceID';
-import UnlockWithPin from './Security/UnlockWithPin';
+import UnlockWithPasscode from './Security/UnlockWithPasscode';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,8 +44,8 @@ export default function Home() {
           options = {{headerShown: false}}
           />
         <Stack.Screen
-          name = "UnlockWithPin"
-          component = {UnlockWithPin}
+          name = "UnlockWithPasscode"
+          component = {UnlockWithPasscode}
           options = {{headerShown: false}}
           />
         <Stack.Screen

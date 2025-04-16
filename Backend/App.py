@@ -121,6 +121,26 @@ def SetPasscode():
 
     return jsonify({'Message': 'Passcode set successfully'}), 201
 
+@app.route('UnlockWithPasscode')
+def UnlockWithPasscode():
+    if 'username' not in session:
+     return jsonify({'Message': 'Authentication required'}), 403
+    
+    data = request.get_json()
+    passcodeUnlock = data.get('passcode')
+
+    # Check if the passcode is valid
+    if passcodeUnlock != session.get('passcode'):
+        return jsonify({'Message': 'Invalid passcode'}), 401
+    
+
+    # If valid, unlock the user
+    user = User.query.filter_by(username=session['username']).first()
+    if not user:
+        return jsonify({'Message': 'User not found'}), 404
+    
+
+
 @app.route('/SetSched', methods=['POST'])
 def SetSched():
     if 'username' not in session:

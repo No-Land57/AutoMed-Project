@@ -12,7 +12,7 @@ export default function UserDetailsScreen({ navigation }) {
     if (fetchData) {  // Only fetch data if fetchData is true
       const fetchUserDetails = async () => {
         try {
-          const response = await fetch('http://192.168.0.240:5000/userdetails', {
+          const response = await fetch('http://10.0.2.2:5000/userdetails', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -46,7 +46,7 @@ export default function UserDetailsScreen({ navigation }) {
     }
 
     try {
-      const response = await fetch('http://192.168.0.240:5000/userdetails', {
+      const response = await fetch('http://10.0.2.2:5000/userdetails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

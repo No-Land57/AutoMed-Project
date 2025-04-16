@@ -36,7 +36,7 @@ export default function SetPasscode({ navigation }) {
     } else{
 
       try {
-        const response = await fetch('http://192.168.0.240:5000/SetPasscode', {
+        const response = await fetch('http://10.0.2.2:5000/SetPasscode', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
