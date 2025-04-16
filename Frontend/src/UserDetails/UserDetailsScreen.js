@@ -63,7 +63,7 @@ export default function UserDetailsScreen({ navigation }) {
       if(response.status === 201) {
         alert('User details saved successfully!');
       } else {
-        alert("Error: " + data.message);
+        alert("Message: " + data.message);
       }
     } catch (error) {
       console.error('Error:', error);

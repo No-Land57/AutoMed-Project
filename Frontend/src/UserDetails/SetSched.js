@@ -202,9 +202,31 @@ const fetchPrescriptions = async () => {
     >
                   <Text style={styles.dropdownMenuItemText}>Update Passcode</Text>
                 </TouchableOpacity>
-              </View>
-            )}
+              
+              
+                <TouchableOpacity
+      style={styles.dropdownMenuItem}
+      onPress={() => {
+        setIsDropdownVisible(false); // Close the dropdown
+        navigation.navigate('UnlockWithPin'); // Navigate to UnlockWithPin
+      }}
+                >
+                  <Text style={styles.dropdownMenuItemText}>Unlock Storage with Pin</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+      style={styles.dropdownMenuItem}
+      onPress={() => {
+        setIsDropdownVisible(false); // Close the dropdown
+        navigation.navigate('UnlockWithFace'); // Navigate to UnlockWithFace
+      }}
+                >
+                  <Text style={styles.dropdownMenuItemText}>Unlock Storage with Face</Text>
+                </TouchableOpacity>
 
+
+
+                     </View>
+            )}
           {prescriptions.map((prescription, index) => (
             <View key={index} style={styles.card}>
               <Text style={styles.cardTitle}>Prescription {index + 1}</Text>
