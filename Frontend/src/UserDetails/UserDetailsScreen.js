@@ -9,32 +9,31 @@ export default function UserDetailsScreen({ navigation }) {
   const [fetchData, setFetchData] = useState(false);
 
   useEffect(() => {
-    if (fetchData) {  // Only fetch data if fetchData is true
-      const fetchUserDetails = async () => {
-        try {
-          const response = await fetch('http://10.0.2.2:5000/userdetails', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          setName(data.name);
-          setAge(data.age ? String(data.age) : 'N/A');
-          setUserType(data.userType);
-        } catch (error) {
-          console.error('Failed to fetch user details:', error);
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch('http://192.168.0.240:5000/userdetails', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      };
-      fetchUserDetails();
-    }
-  }, [fetchData]);  // Depend on the fetchData flag
+  
+        const data = await response.json();
+        setName(data.name);
+        setAge(data.age ? String(data.age) : '');
+        setUserType(data.userType);
+      } catch (error) {
+        console.error('Failed to fetch user details:', error);
+      }
+    };
+  
+    fetchUserDetails();
+  }, []); // Empty dependency array ensures this runs once on screen load
 
   const handleSaveDetails = async () => {
     console.log('Name:', name);
@@ -46,7 +45,7 @@ export default function UserDetailsScreen({ navigation }) {
     }
 
     try {
-      const response = await fetch('http://10.0.2.2:5000/userdetails', {
+      const response = await fetch('http://192.168.0.240:5000/userdetails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +62,7 @@ export default function UserDetailsScreen({ navigation }) {
       if(response.status === 201) {
         alert('User details saved successfully!');
       } else {
-        alert("Message: " + data.message);
+        alert("Message: " + data.Message);
       }
     } catch (error) {
       console.error('Error:', error);

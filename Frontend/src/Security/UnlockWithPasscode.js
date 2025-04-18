@@ -19,7 +19,7 @@ export default function UnlockWithPasscode({ navigation }) {
         }
 
       try {
-        const response = await fetch('https://10.0.2.2:5000/UnlockWithPasscode', 
+        const response = await fetch('https://192.168.0.240:5000/UnlockWithPasscode', 
           { passcode: passcodeUnlock },
           { withCredentials: true }
         );

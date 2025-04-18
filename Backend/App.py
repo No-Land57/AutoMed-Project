@@ -75,6 +75,11 @@ def login():
 
     return jsonify({'Message': 'Login successful'}), 200
 
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({'Message': 'Logged out successfully'}), 200
+
 @app.route('/userdetails', methods=['GET', 'POST'])
 def user_details():
     if 'username' not in session:
@@ -94,9 +99,9 @@ def user_details():
     
     elif request.method == 'GET':
         return jsonify({
-            'name': user.name if user.name else "N/A",
-            'age': user.age if user.age else "N/A",
-            'userType': user.userType if user.userType else "N/A"
+            'name': user.name if user.name else "",
+            'age': user.age if user.age else "",
+            'userType': user.userType if user.userType else ""
         }), 200
 
 @app.route('/SetPasscode', methods=['POST'])
@@ -121,23 +126,26 @@ def SetPasscode():
 
     return jsonify({'Message': 'Passcode set successfully'}), 201
 
-@app.route('UnlockWithPasscode')
+@app.route('/UnlockWithPasscode', methods=['POST'])
 def UnlockWithPasscode():
     if 'username' not in session:
-     return jsonify({'Message': 'Authentication required'}), 403
-    
+        return jsonify({'Message': 'Authentication required'}), 403
+
     data = request.get_json()
-    passcodeUnlock = data.get('passcode')
+    entered_passcode = data.get('passcode')
 
-    # Check if the passcode is valid
-    if passcodeUnlock != session.get('passcode'):
-        return jsonify({'Message': 'Invalid passcode'}), 401
-    
+    if not entered_passcode:
+        return jsonify({'Message': 'Passcode is required'}), 400
 
-    # If valid, unlock the user
     user = User.query.filter_by(username=session['username']).first()
     if not user:
         return jsonify({'Message': 'User not found'}), 404
+
+    if user.passcode != entered_passcode:
+        return jsonify({'Message': 'Invalid passcode'}), 401
+
+    # Simulate successful unlock (replace with GPIO logic later)
+    return jsonify({'Message': 'Unlocked successfully'}), 200
     
 
 
