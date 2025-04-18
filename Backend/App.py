@@ -30,7 +30,7 @@ class Prescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(24), db.ForeignKey('user.username'), nullable=False) #links to the user
     drug = db.Column(db.String(120))
-    dose = db.Column(db.String(120),nullable=False)
+    dose = db.Column(db.Integer)
     time = db.Column(db.String(120),nullable=False)
     selectedDays = db.Column(db.String(120),nullable=False)
 
@@ -132,7 +132,7 @@ def UnlockWithPasscode():
         return jsonify({'Message': 'Authentication required'}), 403
 
     data = request.get_json()
-    entered_passcode = data.get('passcode')
+    entered_passcode = data.get('entered_passcode')
 
     if not entered_passcode:
         return jsonify({'Message': 'Passcode is required'}), 400
