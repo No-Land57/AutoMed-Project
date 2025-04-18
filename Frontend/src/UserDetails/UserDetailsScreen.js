@@ -11,7 +11,7 @@ export default function UserDetailsScreen({ navigation }) {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch('http://192.168.0.240:5000/userdetails', {
+        const response = await fetch('http://10.0.2.2:5000/userdetails', {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -36,16 +36,13 @@ export default function UserDetailsScreen({ navigation }) {
   }, []); // Empty dependency array ensures this runs once on screen load
 
   const handleSaveDetails = async () => {
-    console.log('Name:', name);
-    console.log('Age:', age);
-    console.log('User Type:', userType);
     if(!name || !age || !userType) {
       alert('Please fill out all fileds.');
       return;
     }
 
     try {
-      const response = await fetch('http://192.168.0.240:5000/userdetails', {
+      const response = await fetch('http://10.0.2.2:5000/userdetails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,8 +65,8 @@ export default function UserDetailsScreen({ navigation }) {
       console.error('Error:', error);
       alert('Failed to save user details');
   };
-    // Save data or navigate to the next screen
-    navigation.navigate('SetPasscode'); // Navigate to Set passcode screen
+    // Save data or replace to the next screen
+    navigation.navigate('SetPasscode'); // replace to Set passcode screen
   };
 
   return (

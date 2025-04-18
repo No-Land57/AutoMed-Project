@@ -36,7 +36,7 @@ export default function SetPasscode({ navigation }) {
     } else{
 
       try {
-        const response = await fetch('http://192.168.0.240:5000/SetPasscode', {
+        const response = await fetch('http://10.0.2.2:5000/SetPasscode', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export default function SetPasscode({ navigation }) {
         const data = await response.json();
         if(response.status === 201) {
           alert('Passcode set successfully!');
-          navigation.navigate('SetSched'); // Navigate to FaceID screen
+          navigation.replace('SetSched'); // replace to FaceID screen
         } else {
           alert("Message: " + data.message);
         }

@@ -1,5 +1,4 @@
 import React from 'react';
-import LoginPage from './LoginPage/Login';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -21,37 +20,37 @@ export default function Home() {
         <Stack.Screen
           name="Login"
           component={Login}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, gestureEnabled: false }}
         />
         <Stack.Screen
           name="SignUp"
           component={SignUpScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, gestureEnabled: false }}
         />
         <Stack.Screen
           name="UserDetailsScreen"
           component={UserDetailsScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, gestureEnabled: false }}
         />
         <Stack.Screen
           name = "SetSched"
           component = {SetSched}
-          options = {{headerShown: false}}
+          options = {{headerShown: false, gestureEnabled: false}}
           />
         <Stack.Screen
           name = "SetPasscode"
           component = {SetPasscode}
-          options = {{headerShown: false}}
+          options = {{headerShown: false, gestureEnabled: false}}
           />
         <Stack.Screen
           name = "UnlockWithPasscode"
           component = {UnlockWithPasscode}
-          options = {{headerShown: false}}
+          options = {{headerShown: false, gestureEnabled: false}}
           />
         <Stack.Screen
           name = "SetFaceID"
           component = {SetFaceID}
-          options = {{headerShown: false}}
+          options = {{headerShown: false, gestureEnabled: false}}
           />
       </Stack.Navigator>
     </NavigationContainer>

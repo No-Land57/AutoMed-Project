@@ -32,7 +32,7 @@ export default function SetSched({ route, navigation }) {
 useEffect(() => {
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch('http://192.168.0.240:5000/userdetails', {
+      const response = await fetch('http://10.0.2.2:5000/userdetails', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -63,7 +63,7 @@ useEffect(() => {
 
 const fetchPrescriptions = async () => {
   try {
-    const response = await fetch("http://192.168.0.240:5000/GetSched", {
+    const response = await fetch("http://10.0.2.2:5000/GetSched", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -132,7 +132,7 @@ const fetchPrescriptions = async () => {
   }
 
     try {
-      const response = await fetch("http://192.168.0.240:5000/SetSched", {
+      const response = await fetch("http://10.0.2.2:5000/SetSched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -188,7 +188,7 @@ const fetchPrescriptions = async () => {
       style={styles.dropdownMenuItem}
       onPress={() => {
         setIsDropdownVisible(false); // Close the dropdown
-        navigation.navigate('UserDetailsScreen'); // Navigate to UserDetailsScreen
+        navigation.navigate('UserDetailsScreen'); // navigate to UserDetailsScreen
       }}
     >
                   <Text style={styles.dropdownMenuItemText}>Update User Details</Text>
@@ -197,7 +197,7 @@ const fetchPrescriptions = async () => {
       style={styles.dropdownMenuItem}
       onPress={() => {
         setIsDropdownVisible(false); // Close the dropdown
-        navigation.navigate('SetPasscode'); // Navigate to SetPasscode
+        navigation.navigate('SetPasscode'); // navigate to SetPasscode
       }}
     >
                   <Text style={styles.dropdownMenuItemText}>Update Passcode</Text>
@@ -208,7 +208,7 @@ const fetchPrescriptions = async () => {
       style={styles.dropdownMenuItem}
       onPress={() => {
         setIsDropdownVisible(false); // Close the dropdown
-        navigation.navigate('UnlockWithPasscode'); // Navigate to UnlockWithPin
+        navigation.navigate('UnlockWithPasscode'); // navigate to UnlockWithPin
       }}
                 >
                   <Text style={styles.dropdownMenuItemText}>Unlock Storage with Passcode</Text>
@@ -217,7 +217,7 @@ const fetchPrescriptions = async () => {
       style={styles.dropdownMenuItem}
       onPress={() => {
         setIsDropdownVisible(false); // Close the dropdown
-        navigation.navigate('UnlockWithFace'); // Navigate to UnlockWithFace
+        navigation.navigate('UnlockWithFace'); // navigate to UnlockWithFace
       }}
                 >
                   <Text style={styles.dropdownMenuItemText}>Unlock Storage with Face</Text>
@@ -326,13 +326,13 @@ const fetchPrescriptions = async () => {
           </TouchableOpacity>
           <TouchableOpacity onPress={async () => {
   try {
-    const response = await fetch('http://192.168.0.240:5000/logout', {
+    const response = await fetch('http://10.0.2.2:5000/logout', {
       method: 'POST',
       credentials: 'include',
     });
 
     if (response.ok) {
-      navigation.navigate('Login');
+      navigation.replace('Login');
     } else {
       alert('Logout failed.');
     }

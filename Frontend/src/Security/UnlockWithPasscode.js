@@ -5,46 +5,49 @@ import { useBlurOnFulfill, useClearByFocusCell } from 'react-native-confirmation
 const CELL_COUNT = 6;
 
 export default function UnlockWithPasscode({ navigation }) {
-    const [passcodeUnlock, setPasscodeUnlock] = useState('');
-    const inputRef = useBlurOnFulfill({ value: passcodeUnlock, cellCount: CELL_COUNT });
+    const [entered_passcode, setEntered_passcode] = useState('');
+    const inputRef = useBlurOnFulfill({ value: entered_passcode, cellCount: CELL_COUNT });
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-        value: passcodeUnlock,
-        setValue: setPasscodeUnlock,
+        value: entered_passcode,
+        setValue: setEntered_passcode,
     });
 
     const handleUnlock = async () => {
-        if (passcodeUnlock.length !== 6) {
+        if (entered_passcode.length !== 6) {
             Alert.alert('Error', 'Please enter a 6-digit passcode.');
             return;
         }
 
       try {
-        const response = await fetch('https://192.168.0.240:5000/UnlockWithPasscode', 
-          { passcode: passcodeUnlock },
-          { withCredentials: true }
-        );
+        const response = await fetch('http://10.0.2.2:5000/UnlockWithPasscode', { 
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ entered_passcode: entered_passcode })
+          });
 
-        if(response.formData.message === "Passcode is correct") {
-          alert("Passcode is correct!")
-          navigation.navigate('Home'); // Navigate to Home screen
+        const data = await response.json();
+
+        if (response.ok && data.Message === 'Unlocked successfully') {
+          navigation.replace('SetSched'); // navigate to Home screen
         } else {
-          Alert.alert('failed', 'Passcode is incorrect. Please try again.');
-          setPasscodeUnlock(''); // Clear the passcode input
+          setEntered_passcode(''); // Clear the passcode input
         }
       } catch (error) {
         console.error('Error unlocking with passcode:', error);
-        Alert.alert('Error', 'Failed to unlock. Please try again.');
       }
     };
 
     const handleKeyPress = (key) => {
-        if (passcodeUnlock.length < CELL_COUNT) {
-            setPasscodeUnlock(passcodeUnlock +key);
+        if (entered_passcode.length < CELL_COUNT) {
+            setEntered_passcode(entered_passcode +key);
         }
     };
 
     const handleDelete = () => {
-        setPasscodeUnlock(passcodeUnlock.slice(0,-1));
+        setEntered_passcode(entered_passcode.slice(0,-1));
     };
 
     return (
@@ -55,7 +58,7 @@ export default function UnlockWithPasscode({ navigation }) {
           {[...Array(CELL_COUNT)].map((_, index) => (
             <View key={index} style={styles.cell} onLayout={getCellOnLayoutHandler(index)}>
               <Text style={styles.cellText}>
-                {index < passcodeUnlock.length ? (index === passcodeUnlock.length - 1 ? passcodeUnlock[index] : '•') : '_'}
+                {index < entered_passcode.length ? (index === entered_passcode.length - 1 ? entered_passcode[index] : '•') : '_'}
               </Text>
             </View>
           ))}
@@ -66,8 +69,8 @@ export default function UnlockWithPasscode({ navigation }) {
           style={styles.hiddenInput}
           keyboardType="number-pad"
           maxLength={CELL_COUNT}
-          value={passcodeUnlock}
-          onChangeText={(text) => setPasscodeUnlock(text)}
+          value={entered_passcode}
+          onChangeText={(text) => setEntered_passcode(text)}
         />
   
         <View style={styles.keypad}>
@@ -111,7 +114,7 @@ export default function UnlockWithPasscode({ navigation }) {
   
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.goBack('SetSched')}
         >
           <Text style={styles.backButtonText}>{"<"} Back</Text>
         </TouchableOpacity>
