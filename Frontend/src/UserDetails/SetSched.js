@@ -32,7 +32,7 @@ export default function SetSched({ route, navigation }) {
 useEffect(() => {
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:5000/userdetails', {
+      const response = await fetch('http://192.168.0.240:5000/userdetails', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -63,7 +63,7 @@ useEffect(() => {
 
 const fetchPrescriptions = async () => {
   try {
-    const response = await fetch("http://10.0.2.2:5000/GetSched", {
+    const response = await fetch("http://192.168.0.240:5000/GetSched", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -132,7 +132,7 @@ const fetchPrescriptions = async () => {
   }
 
     try {
-      const response = await fetch("http://10.0.2.2:5000/SetSched", {
+      const response = await fetch("http://192.168.0.240:5000/SetSched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,7 +146,7 @@ const fetchPrescriptions = async () => {
       if (response.status === 201) {
         alert("Medication has been set!");
     } else {
-      alert("message: " + data.message);
+      alert("Message: " + data.Message);
     }
   } catch (error) {
       alert("An error occurred. Please try again.");
@@ -191,18 +191,8 @@ const fetchPrescriptions = async () => {
         navigation.navigate('UserDetailsScreen'); // navigate to UserDetailsScreen
       }}
     >
-                  <Text style={styles.dropdownMenuItemText}>Update User Details</Text>
+                  <Text style={styles.dropdownMenuItemText}>Update User Details and Passcode</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-      style={styles.dropdownMenuItem}
-      onPress={() => {
-        setIsDropdownVisible(false); // Close the dropdown
-        navigation.navigate('SetPasscode'); // navigate to SetPasscode
-      }}
-    >
-                  <Text style={styles.dropdownMenuItemText}>Update Passcode</Text>
-                </TouchableOpacity>
-              
               
                 <TouchableOpacity
       style={styles.dropdownMenuItem}
@@ -243,6 +233,7 @@ const fetchPrescriptions = async () => {
                   placeholder="Dose"
                   placeholderTextColor="#aaa"
                   value={prescription.dose}
+                  keyboardType = "numeric"
                   onChangeText={(text) => setPrescriptions((prev) => prev.map((p, i) => (i === index ? { ...p, dose: text } : p)))}
                 />
                 <TouchableOpacity
@@ -326,7 +317,7 @@ const fetchPrescriptions = async () => {
           </TouchableOpacity>
           <TouchableOpacity onPress={async () => {
   try {
-    const response = await fetch('http://10.0.2.2:5000/logout', {
+    const response = await fetch('http://192.168.0.240:5000/logout', {
       method: 'POST',
       credentials: 'include',
     });

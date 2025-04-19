@@ -19,7 +19,7 @@ export default function LoginScreen({ navigation }) {
     }
 
      try {
-      const response = await fetch('http://10.0.2.2:5000/login', {
+      const response = await fetch('http://192.168.0.240:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ export default function LoginScreen({ navigation }) {
         Don’t have an account?{' '}
         <Text
           style={styles.signupText}
-          onPress={() => navigation.replace('SignUp')}
+          onPress={() => navigation.navigate('SignUp')}
         >
           Sign up
         </Text>
