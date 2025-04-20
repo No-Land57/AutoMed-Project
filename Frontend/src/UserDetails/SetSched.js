@@ -32,7 +32,7 @@ export default function SetSched({ route, navigation }) {
 useEffect(() => {
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch('http://192.168.0.240:5000/userdetails', {
+      const response = await fetch('http://10.0.2.2:5000/userdetails', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -63,7 +63,7 @@ useEffect(() => {
 
 const fetchPrescriptions = async () => {
   try {
-    const response = await fetch("http://192.168.0.240:5000/GetSched", {
+    const response = await fetch("http://10.0.2.2:5000/GetSched", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -74,23 +74,37 @@ const fetchPrescriptions = async () => {
     if (response.ok) {
       const prescriptionsData = await response.json();
 
-      if (prescriptionsData.length === 0) {
-        return;
-      }
-      
-      setPrescriptions(prescriptionsData.map(pres => ({
-        ...pres,
+      // Initialize empty prescriptions
+      const defaultPrescription = () => ({
+        drug: "",
+        dose: "",
+        time: "",
+        selectedDays: [],
         isTimePickerVisible: false,
-        tempTime: new Date(pres.time),
-      })));
-    } else {
-      return
-      //console.error("Failed to load prescriptions:", response.statusText);
+        tempTime: new Date(),
+      });
+
+      // Rebuild array of length 3, filling in gaps by slot
+      const paddedPrescriptions = [defaultPrescription(), defaultPrescription(), defaultPrescription()];
+      prescriptionsData.forEach((pres) => {
+        const slot = pres.slot;
+        if (slot >= 0 && slot < 3) {
+          paddedPrescriptions[slot] = {
+            ...pres,
+            dose: pres.dose !== null ? String(pres.dose) : "",
+            isTimePickerVisible: false,
+            tempTime: new Date(pres.time),
+          };
+        }
+      });
+
+      setPrescriptions(paddedPrescriptions);
     }
   } catch (error) {
     console.error("Error fetching prescriptions:", error);
   }
 };
+
 
   const toggleDaySelection = (index, day) => {
     setPrescriptions((prev) => {
@@ -100,6 +114,7 @@ const fetchPrescriptions = async () => {
       return prev.map((p, i) => (i === index ? { ...p, selectedDays } : p));
     });
   };
+
 
   const handleConfirmTime = (index) => {
     setPrescriptions((prev) => {
@@ -132,7 +147,7 @@ const fetchPrescriptions = async () => {
   }
 
     try {
-      const response = await fetch("http://192.168.0.240:5000/SetSched", {
+      const response = await fetch("http://10.0.2.2:5000/SetSched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -317,7 +332,7 @@ const fetchPrescriptions = async () => {
           </TouchableOpacity>
           <TouchableOpacity onPress={async () => {
   try {
-    const response = await fetch('http://192.168.0.240:5000/logout', {
+    const response = await fetch('http://10.0.2.2:5000/logout', {
       method: 'POST',
       credentials: 'include',
     });

@@ -29,6 +29,7 @@ class User(db.Model):
 class Prescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(24), db.ForeignKey('user.username'), nullable=False) #links to the user
+    slot = db.Column(db.Integer) #slot number for the prescription
     drug = db.Column(db.String(120))
     dose = db.Column(db.Integer)
     time = db.Column(db.String(120),nullable=False)
@@ -158,42 +159,76 @@ def SetSched():
     if not prescriptions:
         return jsonify({'Message': 'No prescriptions provided'}), 400
 
-    for pres in prescriptions:
-        if not all(pres.get(key) for key in ['drug', 'dose', 'time', 'selectedDays']):
-            return jsonify({'Message': 'Missing fields in prescription'}), 400
+    has_valid = False
 
-        print(f"Time: {pres['time']}")
-        print(f"Selected Days: {','.join(pres['selectedDays'])}")
-
-        new_prescription = Prescription(
-            username=session['username'],
-            drug=pres['drug'],
-            dose=pres['dose'],
-            time=pres['time'],
-            selectedDays=",".join(pres['selectedDays'])  # Store as comma-separated string
-      
+    for i, pres in enumerate(prescriptions):
+        filled = (
+            bool(pres.get('drug')) and
+            bool(pres.get('dose')) and
+            bool(pres.get('time')) and
+            isinstance(pres.get('selectedDays'), list) and len(pres.get('selectedDays')) > 0
         )
-        db.session.add(new_prescription)
+
+        empty = (
+            not pres.get('drug') and
+            not pres.get('dose') and
+            not pres.get('time') and
+            (not isinstance(pres.get('selectedDays'), list) or len(pres.get('selectedDays')) == 0)
+        )
+
+        existing = Prescription.query.filter_by(username=session['username'], slot=i).first()
+
+        if filled:
+            has_valid = True
+            if existing:
+                # Update existing prescription
+                existing.drug = pres['drug']
+                existing.dose = pres['dose']
+                existing.time = pres['time']
+                existing.selectedDays = ",".join(pres['selectedDays'])
+            else:
+                # Add new prescription
+                new_prescription = Prescription(
+                    username=session['username'],
+                    slot=i,
+                    drug=pres['drug'],
+                    dose=pres['dose'],
+                    time=pres['time'],
+                    selectedDays=",".join(pres['selectedDays'])
+                )
+                db.session.add(new_prescription)
+
+        elif empty and existing:
+            # Delete prescription if current slot is cleared
+            db.session.delete(existing)
+
+        elif not filled and not empty:
+            return jsonify({'Message': f'Prescription {i+1} is incomplete.'}), 400
+
+    if not has_valid:
+        return jsonify({'Message': 'Fill out at least one complete prescription.'}), 400
 
     db.session.commit()
     return jsonify({'Message': 'Prescriptions updated successfully'}), 201
+
 
 @app.route('/GetSched', methods=['GET'])
 def GetSched():
     if 'username' not in session:
         return jsonify({'Message': 'Authentication required'}), 403
 
-    prescriptions = Prescription.query.filter_by(username=session['username']).all()
+    prescriptions = Prescription.query.filter_by(username=session['username']).order_by(Prescription.slot).all()
     if not prescriptions:
-        return jsonify({'Message': 'No prescriptions found'}), 404
+        return jsonify([]), 200  # return empty list instead of 404 to avoid breaking frontend
 
     schedule = []
     for pres in prescriptions:
         schedule.append({
+            'slot': pres.slot,
             'drug': pres.drug,
             'dose': pres.dose,
             'time': pres.time,
-            'selectedDays': pres.selectedDays.split(",")  # Convert back to list
+            'selectedDays': pres.selectedDays.split(",")
         })
 
     return jsonify(schedule), 200
