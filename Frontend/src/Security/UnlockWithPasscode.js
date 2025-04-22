@@ -19,7 +19,7 @@ export default function UnlockWithPasscode({ navigation }) {
         }
 
       try {
-        const response = await fetch('http://10.0.2.2:5000/UnlockWithPasscode', { 
+        const response = await fetch('http://192.168.0.240:5000/UnlockWithPasscode', { 
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',

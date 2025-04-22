@@ -19,7 +19,7 @@ export default function LoginScreen({ navigation }) {
     }
 
      try {
-      const response = await fetch('http://10.0.2.2:5000/login', {
+      const response = await fetch('http://192.168.0.240:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ export default function LoginScreen({ navigation }) {
       const data = await response.json();
       if(response.status === 200) {
         alert('Login successful!');
-        navigation.replace('SetSched');
+        navigation.replace('SetFaceID');
       }
       else {
         alert("Message: " + data.Message);

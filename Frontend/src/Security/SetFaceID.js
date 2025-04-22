@@ -9,6 +9,7 @@ export default function FaceID({ navigation }) {
   const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
   const cameraRef = useRef(null);
   const [photoCount, setPhotoCount] = useState(0);
+  const [photos, setPhotos] = useState([]);
 
   if (!permission || !mediaPermission) return <View />;
 
@@ -41,13 +42,60 @@ export default function FaceID({ navigation }) {
       return;
     }
 
-    const photo = await cameraRef.current.takePictureAsync();
-    await MediaLibrary.saveToLibraryAsync(photo.uri);
-    console.log(`Photo ${photoCount + 1} saved:`, photo.uri);
-    setPhotoCount(photoCount + 1);
+    const photo = await cameraRef.current.takePictureAsync({ base64: false });
+    setPhotos(prev => [...prev, photo]);
+    setPhotoCount(prev => prev + 1);
 
     if (photoCount + 1 === 3) {
-      alert('You have taken 3 photos. All saved to gallery!');
+      alert('You have taken 3 photos. Uploading...');
+      await uploadImages([...photos, photo]);
+    }
+  }
+
+  async function uploadImages(images) {
+    const formData = new FormData();
+    formData.append('image1', {
+      uri: images[0].uri,
+      type: 'image/jpeg',
+      name: 'image1.jpg',
+    });
+    formData.append('image2', {
+      uri: images[1].uri,
+      type: 'image/jpeg',
+      name: 'image2.jpg',
+    });
+    formData.append('image3', {
+      uri: images[2].uri,
+      type: 'image/jpeg',
+      name: 'image3.jpg',
+    });
+  
+    try {
+      const response = await fetch('http://192.168.0.240:5000/SetFaceID', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        credentials: 'include',
+        body: formData,
+      });
+  
+      const responseText = await response.text();
+      try {
+        const data = JSON.parse(responseText);
+        console.log(data);
+        if (response.ok) {
+          alert('Images uploaded successfully!');
+        } else {
+          alert(data.Message || 'Upload failed');
+        }
+      } catch (err) {
+        console.error('Non-JSON response:', responseText);
+        alert('Unexpected server response');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload error');
     }
   }
 
@@ -55,7 +103,7 @@ export default function FaceID({ navigation }) {
     <View style={styles.container}>
       <View style={styles.smoothBox}>
         <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
-            <View style={styles.faceGuide} />
+          <View style={styles.faceGuide} />
         </CameraView>
       </View>
       <View style={styles.buttonContainer}>
@@ -65,15 +113,16 @@ export default function FaceID({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={takePicture}>
           <Text style={styles.text}>Take Picture ({photoCount}/3)</Text>
         </TouchableOpacity>
-        {photoCount === 3 ? (
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SetSched')}>
-            <Text style={styles.text}>Next</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.button} onPress={() => alert('Please take 3 photos')}>
-            <Text style={styles.text}>Next</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            photoCount === 3
+              ? navigation.navigate('SetSched')
+              : alert('Please take 3 photos')
+          }
+        >
+          <Text style={styles.text}>Next</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -84,7 +133,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#121212', // Dark background for contrast
+    backgroundColor: '#121212',
   },
   message: {
     textAlign: 'center',
@@ -94,8 +143,8 @@ const styles = StyleSheet.create({
   smoothBox: {
     width: '90%',
     height: '60%',
-    borderRadius: 20, // Smooth rounded corners
-    overflow: 'hidden', // Ensures the camera fits neatly inside
+    borderRadius: 20,
+    overflow: 'hidden',
     borderWidth: 2,
     borderColor: '#fff',
     backgroundColor: 'black',
@@ -107,13 +156,13 @@ const styles = StyleSheet.create({
   },
   faceGuide: {
     position: 'absolute',
-    top: '25%', // Adjusts vertical position
-    left: '20%', // Centers horizontally
-    width: '60%', // Width of the oval
-    height: '60%', // Height of the oval
-    borderRadius: 100, // Makes it an oval
+    top: '25%',
+    left: '20%',
+    width: '60%',
+    height: '60%',
+    borderRadius: 100,
     borderWidth: 3,
-    borderColor: 'rgb(30, 206, 74)', // White semi-transparent border
+    borderColor: 'rgb(30, 206, 74)',
     alignSelf: 'center',
   },
   buttonContainer: {
