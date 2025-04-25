@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_session import Session
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -11,6 +13,9 @@ app.config['SESSION_TYPE'] = 'filesystem'
 
 Session(app)
 CORS(app, supports_credentials=True)
+
+UPLOAD_FOLDER = 'static/images'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
 
@@ -25,6 +30,10 @@ class User(db.Model):
     name = db.Column(db.String(120))
     age = db.Column(db.Integer)
     userType = db.Column(db.String(120))
+
+    image1_path = db.Column(db.String(255))
+    image2_path = db.Column(db.String(255))
+    image3_path = db.Column(db.String(255))
 
 class Prescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -104,6 +113,32 @@ def user_details():
             'age': user.age if user.age else "",
             'userType': user.userType if user.userType else ""
         }), 200
+    
+@app.route('/SetFaceID', methods = ['POST'])
+def SetFaceID():
+    if 'username' not in session:
+        return jsonify({'Message': 'Authentication required'}), 403
+
+    user = User.query.filter_by(username=session['username']).first()
+    if not user:
+        return jsonify({'Message': 'User not found'}), 404
+
+    if not all(k in request.files for k in ['image1', 'image2', 'image3']):
+        return jsonify({'Message': 'All three images are required'}), 400
+
+    filenames = []
+    for i in range(1, 4):
+        file = request.files[f'image{i}']
+        ext = file.filename.rsplit('.', 1)[-1]
+        filename = secure_filename(f"{user.username}_image{i}.{ext}")
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        filenames.append(filepath.replace("\\", "/"))  # fix for Windows paths
+
+    user.image1_path, user.image2_path, user.image3_path = filenames
+    db.session.commit()
+
+    return jsonify({'Message': 'Images uploaded successfully'}), 200
 
 @app.route('/SetPasscode', methods=['POST'])
 def SetPasscode():
