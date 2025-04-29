@@ -34,7 +34,7 @@ export default function LoginScreen({ navigation }) {
       const data = await response.json();
       if(response.status === 200) {
         alert('Login successful!');
-        navigation.replace('SetFaceID');
+        navigation.replace('SetSched');
       }
       else {
         alert("Message: " + data.Message);

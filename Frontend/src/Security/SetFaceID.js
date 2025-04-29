@@ -69,7 +69,7 @@ export default function FaceID({ navigation }) {
       type: 'image/jpeg',
       name: 'image3.jpg',
     });
-  
+  /*
     try {
       const response = await fetch('http://192.168.0.240:5000/SetFaceID', {
         method: 'POST',
@@ -97,6 +97,7 @@ export default function FaceID({ navigation }) {
       console.error('Upload error:', error);
       alert('Upload error');
     }
+      */
   }
 
   return (

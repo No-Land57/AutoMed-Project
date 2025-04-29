@@ -35,6 +35,10 @@ class User(db.Model):
     image2_path = db.Column(db.String(255))
     image3_path = db.Column(db.String(255))
 
+class CurrentSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(24), nullable=False)
+
 class Prescription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(24), db.ForeignKey('user.username'), nullable=False) #links to the user
@@ -82,6 +86,14 @@ def login():
         return jsonify({'Message': 'Invalid password'}), 401
     
     session['username'] = username
+
+    existing_session = CurrentSession.query.first()
+    if existing_session:
+        existing_session.username = username  # overwrite the existing session
+    else:
+        new_session = CurrentSession(username=username)  # create a new session
+        db.session.add(new_session)
+    db.session.commit()
 
     return jsonify({'Message': 'Login successful'}), 200
 

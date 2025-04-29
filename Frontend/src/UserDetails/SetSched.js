@@ -27,7 +27,7 @@ export default function SetSched({ route, navigation }) {
     { drug: "", dose: "", time: "", selectedDays: [], isTimePickerVisible: false, tempTime: new Date() },
   ]);
 
-  const daysOfWeek = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 useEffect(() => {
   const fetchUserDetails = async () => {
@@ -222,7 +222,7 @@ const fetchPrescriptions = async () => {
       style={styles.dropdownMenuItem}
       onPress={() => {
         setIsDropdownVisible(false); // Close the dropdown
-        navigation.navigate('UnlockWithFace'); // navigate to UnlockWithFace
+        // navigation.navigate('UnlockWithFaceID'); // navigate to UnlockWithFace
       }}
                 >
                   <Text style={styles.dropdownMenuItemText}>Unlock Storage with Face</Text>
@@ -290,14 +290,14 @@ const fetchPrescriptions = async () => {
               {prescription.isTimePickerVisible && (
                 <View>
                   <DateTimePicker
-                    value={prescription.tempTime}
+                    value={new Date(2000, 0, 1, prescription.tempTime.getHours(), prescription.tempTime.getMinutes())}
                     mode="time"
                     display="spinner"
                     onChange={(event, selectedTime) => {
                       if (event.type === "set" && selectedTime) {
                         setPrescriptions((prev) => prev.map((p, i) => (i === index ? { ...p, tempTime: selectedTime } : p)));
-                        handleConfirmTime(index);
-                      } else {
+                        // Do NOT call handleConfirmTime yet! Let the user press the Confirm button
+                      } else if (event.type === "dismissed") {
                         setPrescriptions((prev) => prev.map((p, i) => (i === index ? { ...p, isTimePickerVisible: false } : p)));
                       }
                     }}
