@@ -19,7 +19,7 @@ export default function UnlockWithPasscode({ navigation }) {
         }
 
       try {
-        const response = await fetch('http://192.168.0.240:5000/UnlockWithPasscode', { 
+        const response = await fetch('http://192.168.0.246:5000/UnlockWithPasscode', { 
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export default function UnlockWithPasscode({ navigation }) {
         const data = await response.json();
 
         if (response.ok && data.Message === 'Unlocked successfully') {
-          navigation.replace('SetSched'); // navigate to Home screen
+        //  navigation.replace('SetSched'); // navigate to Home screen
         } else {
           setEntered_passcode(''); // Clear the passcode input
         }

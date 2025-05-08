@@ -69,9 +69,9 @@ export default function FaceID({ navigation }) {
       type: 'image/jpeg',
       name: 'image3.jpg',
     });
-  /*
+
     try {
-      const response = await fetch('http://192.168.0.240:5000/SetFaceID', {
+      const response = await fetch('http://192.168.0.246:5000/SetFaceID', {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -97,7 +97,7 @@ export default function FaceID({ navigation }) {
       console.error('Upload error:', error);
       alert('Upload error');
     }
-      */
+
   }
 
   return (
@@ -118,7 +118,7 @@ export default function FaceID({ navigation }) {
           style={styles.button}
           onPress={() =>
             photoCount === 3
-              ? navigation.navigate('SetSched')
+              ? navigation.replace('SetSched')
               : alert('Please take 3 photos')
           }
         >

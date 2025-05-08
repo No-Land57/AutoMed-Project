@@ -4,6 +4,10 @@ from flask_cors import CORS
 from flask_session import Session
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime, timedelta
+
+# Dictionary to store unlock timestamps for users
+unlock_timestamps = {}
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -18,6 +22,7 @@ UPLOAD_FOLDER = 'static/images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
+unlock_timestamps = {}
 
 class User(db.Model):
     #signup/login
@@ -40,6 +45,7 @@ class CurrentSession(db.Model):
     username = db.Column(db.String(24), nullable=False)
 
 class Prescription(db.Model):
+    __tablename__ = 'prescriptions'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(24), db.ForeignKey('user.username'), nullable=False) #links to the user
     slot = db.Column(db.Integer) #slot number for the prescription
@@ -176,26 +182,42 @@ def SetPasscode():
 
 @app.route('/UnlockWithPasscode', methods=['POST'])
 def UnlockWithPasscode():
-    if 'username' not in session:
-        return jsonify({'Message': 'Authentication required'}), 403
-
     data = request.get_json()
     entered_passcode = data.get('entered_passcode')
 
     if not entered_passcode:
-        return jsonify({'Message': 'Passcode is required'}), 400
+        return jsonify({'Message': 'Passcode required'}), 400
 
-    user = User.query.filter_by(username=session['username']).first()
+    current_session = CurrentSession.query.first()
+    if not current_session:
+        return jsonify({'Message': 'No active user session'}), 404
+
+    username = current_session.username
+    user = User.query.filter_by(username=username).first()
     if not user:
         return jsonify({'Message': 'User not found'}), 404
 
     if user.passcode != entered_passcode:
         return jsonify({'Message': 'Invalid passcode'}), 401
 
-    # Simulate successful unlock (replace with GPIO logic later)
-    return jsonify({'Message': 'Unlocked successfully'}), 200
-    
+    unlock_timestamps[username] = datetime.utcnow() + timedelta(seconds=10)
 
+    return jsonify({'Message': 'Unlocked successfully'}), 200   
+
+@app.route('/should_unlock', methods=['GET'])
+def should_unlock():
+    current_session = CurrentSession.query.first()
+    if not current_session:
+        return jsonify({'unlock': False})
+
+    username = current_session.username
+    expires_at = unlock_timestamps.get(username)
+
+    if expires_at and datetime.utcnow() <= expires_at:
+        # clear after reading
+        del unlock_timestamps[username]
+        return jsonify({'unlock': True})
+    return jsonify({'unlock': False})
 
 @app.route('/SetSched', methods=['POST'])
 def SetSched():
