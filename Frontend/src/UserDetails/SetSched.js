@@ -222,10 +222,10 @@ const fetchPrescriptions = async () => {
       style={styles.dropdownMenuItem}
       onPress={() => {
         setIsDropdownVisible(false); // Close the dropdown
-        // navigation.navigate('UnlockWithFaceID'); // navigate to UnlockWithFace
+        navigation.navigate('UnlockWithFaceID'); // navigate to UnlockWithFace
       }}
                 >
-                  <Text style={styles.dropdownMenuItemText}>Unlock Storage with Face</Text>
+                  <Text style={styles.dropdownMenuItemText}>Unlock Storage with FaceID</Text>
                 </TouchableOpacity>
 
 

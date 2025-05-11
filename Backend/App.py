@@ -3,11 +3,48 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_session import Session
 from werkzeug.utils import secure_filename
-import os
 from datetime import datetime, timedelta
+import os
+#import RPi.GPIO as GPIO
+import time
+import atexit
+#pi camera stuff below
+import cv2
+import face_recognition
+from picamera2 import Picamera2
+import numpy as np
 
-# Dictionary to store unlock timestamps for users
-unlock_timestamps = {}
+'''
+IN3 = 25
+IN4 = 8
+ENB = 7
+
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(IN3, GPIO.OUT)
+GPIO.setup(IN4, GPIO.OUT)
+GPIO.setup(ENB, GPIO.OUT)
+
+pwm = GPIO.PWM(ENB, 1000)
+pwm.start(0)
+
+def unlock():
+    GPIO.output(IN3, GPIO.HIGH)
+    GPIO.output(IN4, GPIO.LOW)
+    pwm.ChangeDutyCycle(100)
+
+def lock():
+    GPIO.output(IN3, GPIO.LOW)
+    GPIO.output(IN4, GPIO.LOW)
+    pwm.ChangeDutyCycle(0)
+
+def cleanup_gpio():
+    pwm.stop()
+    GPIO.cleanup()
+
+atexit.register(cleanup_gpio)
+'''
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -22,7 +59,7 @@ UPLOAD_FOLDER = 'static/images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 db = SQLAlchemy(app)
-unlock_timestamps = {}
+last_unlock_time = 0
 
 class User(db.Model):
     #signup/login
@@ -182,6 +219,10 @@ def SetPasscode():
 
 @app.route('/UnlockWithPasscode', methods=['POST'])
 def UnlockWithPasscode():
+    global last_unlock_time
+    if time.time() - last_unlock_time < 3:
+        return jsonify({'Message': 'Please wait before trying again'}), 429
+
     data = request.get_json()
     entered_passcode = data.get('entered_passcode')
 
@@ -199,25 +240,72 @@ def UnlockWithPasscode():
 
     if user.passcode != entered_passcode:
         return jsonify({'Message': 'Invalid passcode'}), 401
+    '''
+    unlock()
+    time.sleep(5)
+    lock()
+    last_unlock_time = time.time()
+    '''
+    return jsonify({'Message': 'Unlocked successfully'}), 200
 
-    unlock_timestamps[username] = datetime.utcnow() + timedelta(seconds=10)
+@app.route('/UnlockWithFaceID', methods=['POST'])
+def UnlockWithFaceID():
+    global last_unlock_time
 
-    return jsonify({'Message': 'Unlocked successfully'}), 200   
+    if 'username' not in session:
+        return jsonify({'Message': 'Authentication required'}), 403
 
-@app.route('/should_unlock', methods=['GET'])
-def should_unlock():
-    current_session = CurrentSession.query.first()
-    if not current_session:
-        return jsonify({'unlock': False})
+    if time.time() - last_unlock_time < 3:
+        return jsonify({'Message': 'Please wait before trying again'}), 429
 
-    username = current_session.username
-    expires_at = unlock_timestamps.get(username)
+    user = User.query.filter_by(username=session['username']).first()
+    if not user:
+        return jsonify({'Message': 'User not found'}), 404
 
-    if expires_at and datetime.utcnow() <= expires_at:
-        # clear after reading
-        del unlock_timestamps[username]
-        return jsonify({'unlock': True})
-    return jsonify({'unlock': False})
+    # Load user's saved face images
+    known_encodings = []
+    for img_path in [user.image1_path, user.image2_path, user.image3_path]:
+        if img_path and os.path.exists(img_path):
+            image = face_recognition.load_image_file(img_path)
+            locations = face_recognition.face_locations(image)
+            encodings = face_recognition.face_encodings(image, locations)
+            if encodings:
+                known_encodings.append(encodings[0])
+
+    if not known_encodings:
+        return jsonify({'Message': 'No face data found for this user'}), 400
+
+    try:
+        # Start PiCamera and capture one frame
+        picam2 = Picamera2()
+        picam2.start()
+        time.sleep(1)  # warm-up
+        frame = picam2.capture_array()
+        picam2.stop()
+
+        # Convert to RGB and detect faces
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        live_locations = face_recognition.face_locations(rgb_frame)
+        live_encodings = face_recognition.face_encodings(rgb_frame, live_locations)
+
+        for live_face in live_encodings:
+            results = face_recognition.compare_faces(known_encodings, live_face)
+            distances = face_recognition.face_distance(known_encodings, live_face)
+            best_match_index = np.argmin(distances)
+
+            if results[best_match_index]:
+                # ✅ UNLOCK LOGIC GOES HERE
+                # unlock()
+                # time.sleep(5)
+                # lock()
+                last_unlock_time = time.time()
+                return jsonify({'Message': 'Unlocked successfully with FaceID'}), 200
+
+        return jsonify({'Message': 'Face not recognized'}), 401
+
+    except Exception as e:
+        print("[ERROR] FaceID matching failed:", e)
+        return jsonify({'Message': 'Internal server error'}), 500
 
 @app.route('/SetSched', methods=['POST'])
 def SetSched():
@@ -305,5 +393,10 @@ def GetSched():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        app.run(host='0.0.0.0', port=5000, debug=True)
+    
+    is_main = os.environ.get('WERKZEUG_RUN_MAIN', 'true') == 'true'
+
+    if is_main:
+        print("Starting server...")
+        app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
     #app.run(debug=True)
