@@ -5,15 +5,18 @@ from flask_session import Session
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 import os
+#TODO UNCOMMENT
 #import RPi.GPIO as GPIO
 import time
 import atexit
+
 #pi camera stuff below
 import cv2
 import face_recognition
 from picamera2 import Picamera2
 import numpy as np
 
+#TODO UNCOMMENT
 '''
 IN3 = 25
 IN4 = 8
@@ -217,6 +220,7 @@ def SetPasscode():
 
     return jsonify({'Message': 'Passcode set successfully'}), 201
 
+#TODO UNCOMMENT LOCK AND UNLOCK FUNCTIONS
 @app.route('/UnlockWithPasscode', methods=['POST'])
 def UnlockWithPasscode():
     global last_unlock_time
@@ -248,6 +252,7 @@ def UnlockWithPasscode():
     '''
     return jsonify({'Message': 'Unlocked successfully'}), 200
 
+#TODO IMPLEMENT PROPERLY
 @app.route('/UnlockWithFaceID', methods=['POST'])
 def UnlockWithFaceID():
     global last_unlock_time
