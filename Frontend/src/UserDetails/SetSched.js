@@ -330,8 +330,6 @@ const fetchPrescriptions = async () => {
           <TouchableOpacity style={styles.dispenseButton} onPress={handleDispense}>
             <Text style={styles.dispenseButtonText}>Set Schedule!</Text>
           </TouchableOpacity>
-
-          
           <TouchableOpacity onPress={() => navigation.replace('Login')} style={styles.LogoutButton}>
               <Text style={styles.LogoutButtonText}>Logout</Text>
             </TouchableOpacity>
